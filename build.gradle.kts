@@ -19,11 +19,13 @@ repositories {
 }
 
 val telegramBotsVersion = "9.4.0"
+val springCloudVersion by extra("2025.1.1")
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("org.aspectj:aspectjrt")
-    implementation("org.aspectj:aspectjweaver")
+    implementation("org.springframework.boot:spring-boot-starter-aspectj")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-all")
     implementation("org.telegram:telegrambots-springboot-longpolling-starter:$telegramBotsVersion")
     implementation("org.telegram:telegrambots-client:$telegramBotsVersion")
     compileOnly("org.projectlombok:lombok")
@@ -32,6 +34,12 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+    }
 }
 
 tasks.withType<Test> {

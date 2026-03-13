@@ -1,0 +1,2 @@
+backend:
+  base-url: http://api-gateway-dev:8080
