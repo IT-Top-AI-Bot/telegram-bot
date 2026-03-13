@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: it-top-ai-telegram-bot
+
+  config:
+    import: optional:file:.env[.properties]
+
+  threads:
+    virtual:
+      enabled: true
+
+telegram:
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN}
+    username: ${TELEGRAM_BOT_USERNAME}
+
+backend:
+  base-url: ${BACKEND_BASE_URL}
+
+server:
+  port: ${SERVER_PORT:8080}
