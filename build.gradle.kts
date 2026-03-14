@@ -22,7 +22,6 @@ val telegramBotsVersion = "9.4.0"
 val springCloudVersion by extra("2025.1.1")
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-aspectj")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-all")
