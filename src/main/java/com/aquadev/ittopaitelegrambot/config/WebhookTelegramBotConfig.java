@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportRuntimeHints;
 import org.springframework.context.annotation.Profile;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -17,6 +18,7 @@ import java.util.List;
 @Configuration
 @Profile("kubernetes")
 @RequiredArgsConstructor
+@ImportRuntimeHints(TelegramRuntimeHints.class)
 public class WebhookTelegramBotConfig {
 
     private final TelegramProperties telegramProperties;
