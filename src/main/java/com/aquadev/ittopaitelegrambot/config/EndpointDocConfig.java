@@ -1,6 +1,5 @@
 package com.aquadev.ittopaitelegrambot.config;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -9,10 +8,13 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 @Slf4j
 @Configuration
-@RequiredArgsConstructor
 public class EndpointDocConfig {
 
     private final RequestMappingHandlerMapping handlerMapping;
+
+    public EndpointDocConfig(@org.springframework.beans.factory.annotation.Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping handlerMapping) {
+        this.handlerMapping = handlerMapping;
+    }
 
     @Bean
     public ApplicationRunner logEndpoints() {

@@ -2,10 +2,11 @@ package com.aquadev.ittopaitelegrambot.bot;
 
 import com.aquadev.ittopaitelegrambot.bot.annotation.TelegramBotCommand;
 import com.aquadev.ittopaitelegrambot.bot.handler.CommandHandler;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
@@ -18,13 +19,13 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class BotCommandsRegistrar {
+public class BotCommandsRegistrar implements ApplicationRunner {
 
     private final TelegramClient telegramClient;
     private final List<CommandHandler> handlers;
 
-    @PostConstruct
-    void registerCommands() {
+    @Override
+    public void run(ApplicationArguments args) {
         List<BotCommand> commands = new ArrayList<>();
 
         for (CommandHandler handler : handlers) {
@@ -47,7 +48,7 @@ public class BotCommandsRegistrar {
                     commands.size(),
                     commands.stream().map(BotCommand::getCommand).toList());
         } catch (TelegramApiException e) {
-            log.error("Failed to register bot commands", e);
+            log.error("Failed to register bot commands: {}", e.getMessage());
         }
     }
 }
