@@ -5,7 +5,6 @@ import com.aquadev.ittopaitelegrambot.config.properties.TelegramProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -29,7 +28,7 @@ import java.util.concurrent.Executors;
 @Configuration
 @Profile("kubernetes")
 @RequiredArgsConstructor
-public class TelegramWebhookConfig implements org.springframework.web.servlet.config.annotation.WebMvcConfigurer {
+public class TelegramWebhookConfig {
 
     private final TelegramClient telegramClient;
     private final TelegramProperties telegramProperties;
@@ -37,15 +36,20 @@ public class TelegramWebhookConfig implements org.springframework.web.servlet.co
 
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
-    @Override
-    public void configureMessageConverters(java.util.List<HttpMessageConverter<?>> converters) {
-        converters.add(0, telegramUpdateConverter());
+    @Bean
+    public SetWebhook setWebhook() {
+        // The default prefix for the starter is /callback, so the full URL must be /callback/{botPath}
+        String webhookUrl = telegramProperties.webhookBaseUrl() + "/callback/" + telegramProperties.token();
+        return SetWebhook.builder()
+                .url(webhookUrl)
+                .dropPendingUpdates(true)
+                .build();
     }
 
     @Bean
-    public SpringTelegramWebhookBot webhookBot() {
+    public SpringTelegramWebhookBot webhookBot(SetWebhook setWebhook) {
         return SpringTelegramWebhookBot.builder()
-                .botPath("callback")
+                .botPath(telegramProperties.token())
                 .updateHandler(update -> {
                     executor.submit(() -> {
                         try {
@@ -56,7 +60,7 @@ public class TelegramWebhookConfig implements org.springframework.web.servlet.co
                     });
                     return null;
                 })
-                .setWebhook(null)    // registered after server starts — see webhookRegistrar()
+                .setWebhook(setWebhook)
                 .deleteWebhook(() -> {
                     try {
                         telegramClient.execute(DeleteWebhook.builder().dropPendingUpdates(true).build());
@@ -68,25 +72,13 @@ public class TelegramWebhookConfig implements org.springframework.web.servlet.co
                 .build();
     }
 
-    @Bean
-    public ApplicationRunner webhookRegistrar() {
-        return args -> {
-            String webhookUrl = telegramProperties.webhookBaseUrl() + "/callback";
-            try {
-                telegramClient.execute(SetWebhook.builder().url(webhookUrl).build());
-                log.info("Webhook registered: {}", webhookUrl);
-            } catch (TelegramApiException e) {
-                log.error("Failed to register webhook at {}: {}", webhookUrl, e.getMessage());
-            }
-        };
-    }
-
     /**
      * Jackson 2.x converter for telegrambots Update deserialization.
      * Spring Boot 4.x uses Jackson 3.x (tools.jackson) which is incompatible
      * with telegrambots 9.x Jackson 2.x annotations on model classes.
      */
     @Bean
+    @org.springframework.core.annotation.Order(org.springframework.core.Ordered.HIGHEST_PRECEDENCE)
     public HttpMessageConverter<Update> telegramUpdateConverter() {
         return new AbstractHttpMessageConverter<>(MediaType.APPLICATION_JSON) {
             private final ObjectMapper mapper = new ObjectMapper();
