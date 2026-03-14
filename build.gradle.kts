@@ -2,6 +2,7 @@ plugins {
     java
     id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.graalvm.buildtools.native") version "0.10.4"
 }
 
 group = "com.aquadev"
@@ -40,6 +41,24 @@ dependencyManagement {
     imports {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
     }
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            imageName.set("it-top-ai-telegram-bot")
+            buildArgs.addAll(
+                "--no-fallback",
+                "-H:+AddAllCharsets",
+                "-H:IncludeLocales=ru,en"
+            )
+        }
+    }
+    toolchainDetection.set(false)
+}
+
+tasks.named<JavaExec>("processAot") {
+    jvmArgs("-Dspring.profiles.active=kubernetes")
 }
 
 tasks.withType<Test> {

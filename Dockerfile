@@ -1,36 +1,30 @@
 # syntax=docker/dockerfile:1.7
 
 ############################
-# Stage: extract layers from pre-built JAR
+# Stage: native compilation
 ############################
-FROM eclipse-temurin:25-jdk AS extractor
+FROM ghcr.io/graalvm/native-image-community:25 AS builder
+WORKDIR /build
+
+COPY gradlew gradlew.bat* ./
+COPY gradle/ gradle/
+RUN chmod +x ./gradlew
+
+# Cache dependencies separately from source
+COPY build.gradle.kts settings.gradle.kts ./
+RUN ./gradlew dependencies --no-daemon -q 2>/dev/null || true
+
+COPY src/ src/
+RUN ./gradlew nativeCompile --no-daemon
+
+############################
+# Stage: minimal runtime
+############################
+FROM gcr.io/distroless/base-debian12:nonroot
 WORKDIR /application
 
-COPY build/libs/*.jar application.jar
-
-RUN java -Djarmode=tools -jar application.jar extract --layers --launcher --destination extracted
-
-############################
-# Stage: final runtime image
-############################
-FROM eclipse-temurin:25-jre-alpine
-WORKDIR /application
-
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
-
-VOLUME ["/tmp"]
-
-COPY --from=extractor /application/extracted/dependencies/ ./
-COPY --from=extractor /application/extracted/spring-boot-loader/ ./
-COPY --from=extractor /application/extracted/snapshot-dependencies/ ./
-COPY --from=extractor /application/extracted/application/ ./
+COPY --from=builder /build/build/native/nativeCompile/it-top-ai-telegram-bot .
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", \
-  "-XX:+UseZGC", \
-  "-XX:MaxRAMPercentage=75.0", \
-  "-XX:+AlwaysPreTouch", \
-  "-Djava.net.preferIPv4Stack=true", \
-  "org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["/application/it-top-ai-telegram-bot"]
