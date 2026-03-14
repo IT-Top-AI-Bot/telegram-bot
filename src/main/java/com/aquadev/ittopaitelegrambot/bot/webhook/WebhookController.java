@@ -24,8 +24,6 @@ public class WebhookController {
     private final UpdateDispatcher updateDispatcher;
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
-    // Jackson 2.x ObjectMapper — telegrambots использует com.fasterxml.jackson,
-    // а Spring Boot 4.0 по умолчанию использует tools.jackson (3.x), которые несовместимы.
     private final ObjectMapper telegramObjectMapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .registerModule(new JavaTimeModule());
