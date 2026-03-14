@@ -6,9 +6,6 @@
 FROM ghcr.io/graalvm/native-image-community:25 AS builder
 WORKDIR /build
 
-# Install musl for fully static binary
-RUN microdnf install -y musl-gcc musl-devel zlib-static && microdnf clean all
-
 COPY gradlew gradlew.bat* ./
 COPY gradle/ gradle/
 RUN chmod +x ./gradlew
@@ -21,13 +18,15 @@ COPY src/ src/
 RUN ./gradlew nativeCompile --no-daemon
 
 ############################
-# Stage: minimal runtime (no system libs needed for static binary)
+# Stage: minimal runtime
 ############################
-FROM gcr.io/distroless/static-debian12:nonroot
-WORKDIR /application
+FROM debian:bookworm-slim
+RUN groupadd -r spring && useradd -r -g spring spring
 
+WORKDIR /application
 COPY --from=builder /build/build/native/nativeCompile/it-top-ai-telegram-bot .
 
+USER spring:spring
 EXPOSE 8080
 
 ENTRYPOINT ["/application/it-top-ai-telegram-bot"]

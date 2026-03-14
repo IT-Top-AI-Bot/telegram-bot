@@ -49,8 +49,6 @@ graalvmNative {
             imageName.set("it-top-ai-telegram-bot")
             buildArgs.addAll(
                 "--no-fallback",
-                "--static",
-                "--libc=musl",
                 "-H:+AddAllCharsets",
                 "-H:IncludeLocales=ru,en"
             )
