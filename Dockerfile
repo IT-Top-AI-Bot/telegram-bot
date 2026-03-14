@@ -28,4 +28,8 @@ COPY --from=extractor /application/extracted/application/ ./
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["java", \
+  "-XX:+UseZGC", "-XX:+ZGenerational", \
+  "-XX:MaxRAMPercentage=75.0", \
+  "-XX:+AlwaysPreTouch", \
+  "org.springframework.boot.loader.launch.JarLauncher"]

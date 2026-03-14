@@ -11,6 +11,8 @@ import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import java.util.List;
+
 @Slf4j
 @Configuration
 @Profile("kubernetes")
@@ -26,7 +28,11 @@ public class WebhookTelegramBotConfig {
             try {
                 String webhookUrl = telegramProperties.webhookBaseUrl();
                 log.info("Registering webhook URL in Telegram: {}", webhookUrl);
-                telegramClient.execute(SetWebhook.builder().url(webhookUrl).build());
+                telegramClient.execute(SetWebhook.builder()
+                        .url(webhookUrl)
+                        .maxConnections(100)
+                        .allowedUpdates(List.of("message", "callback_query"))
+                        .build());
                 log.info("Webhook successfully registered!");
             } catch (TelegramApiException e) {
                 log.error("Failed to register webhook on startup", e);
