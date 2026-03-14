@@ -31,15 +31,9 @@ public class WebhookTelegramBotConfig {
 
     @Bean
     public SpringTelegramWebhookBot springTelegramWebhookBot() {
-        String path = telegramProperties.webhookPath();
-        if (path != null && path.startsWith("/")) {
-            path = path.substring(1);
-        }
-
-        log.info("Configuring SpringTelegramWebhookBot with path: {}", path);
-
+        // Указываем любой путь, так как мы будем использовать свой контроллер для приема запросов
         return SpringTelegramWebhookBot.builder()
-                .botPath(path)
+                .botPath("bot") 
                 .updateHandler(this::handleUpdate)
                 .build();
     }
@@ -62,7 +56,7 @@ public class WebhookTelegramBotConfig {
         };
     }
 
-    private BotApiMethod<?> handleUpdate(Update update) {
+    public BotApiMethod<?> handleUpdate(Update update) {
         log.info("Received Update from Telegram: {}", update.getUpdateId());
 
         executor.submit(() -> {
