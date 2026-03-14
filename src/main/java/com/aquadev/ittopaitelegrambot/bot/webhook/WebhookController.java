@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -30,6 +32,11 @@ public class WebhookController {
 
     public WebhookController(UpdateDispatcher updateDispatcher) {
         this.updateDispatcher = updateDispatcher;
+    }
+
+    @RequestMapping(value = "/callback/bot", method = RequestMethod.HEAD)
+    public ResponseEntity<Void> head() {
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping(value = "/callback/bot", consumes = MediaType.APPLICATION_JSON_VALUE)
