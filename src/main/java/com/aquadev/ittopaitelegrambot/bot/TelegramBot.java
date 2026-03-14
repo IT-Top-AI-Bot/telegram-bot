@@ -3,6 +3,7 @@ package com.aquadev.ittopaitelegrambot.bot;
 import com.aquadev.ittopaitelegrambot.bot.dispatcher.UpdateDispatcher;
 import com.aquadev.ittopaitelegrambot.config.properties.TelegramProperties;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
 import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
@@ -13,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Component
+@Profile("!kubernetes")
 @RequiredArgsConstructor
 public class TelegramBot implements SpringLongPollingBot, LongPollingUpdateConsumer {
 

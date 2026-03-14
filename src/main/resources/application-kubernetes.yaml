@@ -1,2 +1,6 @@
 backend:
-  base-url: http://api-gateway-dev:8080
+  base-url: http://api-gateway-dev.dev.svc.cluster.local:8080
+
+telegram:
+  bot:
+    webhook-base-url: ${TELEGRAM_BOT_WEBHOOK_BASE_URL}
