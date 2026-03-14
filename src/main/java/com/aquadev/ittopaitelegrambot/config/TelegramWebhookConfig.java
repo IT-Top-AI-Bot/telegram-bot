@@ -9,7 +9,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -30,7 +29,7 @@ import java.util.concurrent.Executors;
 @Configuration
 @Profile("kubernetes")
 @RequiredArgsConstructor
-public class TelegramWebhookConfig {
+public class TelegramWebhookConfig implements org.springframework.web.servlet.config.annotation.WebMvcConfigurer {
 
     private final TelegramClient telegramClient;
     private final TelegramProperties telegramProperties;
@@ -38,12 +37,23 @@ public class TelegramWebhookConfig {
 
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
+    @Override
+    public void configureMessageConverters(java.util.List<HttpMessageConverter<?>> converters) {
+        converters.add(0, telegramUpdateConverter());
+    }
+
     @Bean
     public SpringTelegramWebhookBot webhookBot() {
         return SpringTelegramWebhookBot.builder()
-                .botPath(telegramProperties.token())
+                .botPath("callback")
                 .updateHandler(update -> {
-                    executor.submit(() -> updateDispatcher.dispatch(update));
+                    executor.submit(() -> {
+                        try {
+                            updateDispatcher.dispatch(update);
+                        } catch (Exception e) {
+                            log.error("Error dispatching update: {}", e.getMessage(), e);
+                        }
+                    });
                     return null;
                 })
                 .setWebhook(null)    // registered after server starts — see webhookRegistrar()
@@ -61,7 +71,7 @@ public class TelegramWebhookConfig {
     @Bean
     public ApplicationRunner webhookRegistrar() {
         return args -> {
-            String webhookUrl = telegramProperties.webhookBaseUrl() + "/" + telegramProperties.token();
+            String webhookUrl = telegramProperties.webhookBaseUrl() + "/callback";
             try {
                 telegramClient.execute(SetWebhook.builder().url(webhookUrl).build());
                 log.info("Webhook registered: {}", webhookUrl);
@@ -75,11 +85,8 @@ public class TelegramWebhookConfig {
      * Jackson 2.x converter for telegrambots Update deserialization.
      * Spring Boot 4.x uses Jackson 3.x (tools.jackson) which is incompatible
      * with telegrambots 9.x Jackson 2.x annotations on model classes.
-     * Registered with HIGHEST_PRECEDENCE so Spring MVC picks it up before
-     * the default Jackson 3.x converter for Update instances.
      */
     @Bean
-    @Order(Integer.MIN_VALUE)
     public HttpMessageConverter<Update> telegramUpdateConverter() {
         return new AbstractHttpMessageConverter<>(MediaType.APPLICATION_JSON) {
             private final ObjectMapper mapper = new ObjectMapper();
@@ -92,7 +99,15 @@ public class TelegramWebhookConfig {
             @Override
             protected Update readInternal(Class<? extends Update> clazz, HttpInputMessage inputMessage)
                     throws IOException {
-                return mapper.readValue(inputMessage.getBody(), clazz);
+                log.info("Converting incoming update using telegramUpdateConverter...");
+                try {
+                    Update update = mapper.readValue(inputMessage.getBody(), clazz);
+                    log.info("Successfully converted update: {}", update.getUpdateId());
+                    return update;
+                } catch (Exception e) {
+                    log.error("Failed to convert update: {}", e.getMessage(), e);
+                    throw e;
+                }
             }
 
             @Override
