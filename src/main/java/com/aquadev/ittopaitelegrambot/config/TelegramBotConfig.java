@@ -20,7 +20,7 @@ public class TelegramBotConfig {
     @Bean
     public TelegramClient telegramClient() {
         OkHttpClient httpClient = new OkHttpClient.Builder()
-                .connectionPool(new ConnectionPool(10, 4, TimeUnit.MINUTES))
+                .connectionPool(new ConnectionPool(10, 6, TimeUnit.MINUTES))
                 .connectTimeout(5, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
