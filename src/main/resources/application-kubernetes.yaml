@@ -8,4 +8,5 @@ backend:
 
 telegram:
   bot:
+    webhook-path: "/callback/bot"
     webhook-base-url: ${TELEGRAM_BOT_WEBHOOK_BASE_URL}

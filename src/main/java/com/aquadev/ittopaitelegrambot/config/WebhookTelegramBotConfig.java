@@ -1,4 +1,4 @@
-package com.aquadev.ittopaitelegrambot.bot.webhook;
+package com.aquadev.ittopaitelegrambot.config;
 
 import com.aquadev.ittopaitelegrambot.bot.dispatcher.UpdateDispatcher;
 import com.aquadev.ittopaitelegrambot.config.properties.TelegramProperties;
@@ -27,16 +27,14 @@ public class WebhookTelegramBotConfig {
     private final TelegramProperties telegramProperties;
     private final UpdateDispatcher updateDispatcher;
 
-    // В 9.x клиент для отправки запросов инжектится отдельно
     private final TelegramClient telegramClient;
 
-    // Пул виртуальных потоков для асинхронной обработки
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     @Bean
     public SpringTelegramWebhookBot springTelegramWebhookBot() {
         return SpringTelegramWebhookBot.builder()
-                .botPath(telegramProperties.webhookBaseUrl())
+                .botPath(telegramProperties.webhookPath())
                 .updateHandler(this::handleUpdate)
                 .setWebhook(this::registerWebhook)
                 .deleteWebhook(this::removeWebhook)
@@ -54,7 +52,6 @@ public class WebhookTelegramBotConfig {
         try {
             SetWebhook setWebhook = SetWebhook.builder()
                     .url(telegramProperties.webhookBaseUrl())
-                    // .secretToken("your-secret-token") // Опционально: для доп. безопасности в k8s
                     .build();
             telegramClient.execute(setWebhook);
             log.info("Webhook successfully set to: {}", telegramProperties.webhookBaseUrl());
