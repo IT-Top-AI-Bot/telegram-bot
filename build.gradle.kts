@@ -27,6 +27,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-all")
     implementation("org.telegram:telegrambots-springboot-longpolling-starter:$telegramBotsVersion")
+    implementation("org.telegram:telegrambots-springboot-webhook-starter:$telegramBotsVersion")
     implementation("org.telegram:telegrambots-client:$telegramBotsVersion")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
