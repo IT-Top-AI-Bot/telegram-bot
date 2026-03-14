@@ -7,7 +7,7 @@ backend:
   base-url: http://api-gateway-dev.dev.svc.cluster.local:8080
 
 telegram:
-  webhook-url: "https://tg-bot-dev.actimate.ru/"
+  webhook-url: "https://tg-bot-dev.actimate.ru/callback/"
   bot:
     webhook-path: "bot"
     webhook-base-url: "https://tg-bot-dev.actimate.ru/callback/bot"
