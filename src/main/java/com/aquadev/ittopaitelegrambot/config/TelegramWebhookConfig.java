@@ -38,7 +38,6 @@ public class TelegramWebhookConfig {
 
     @Bean
     public SetWebhook setWebhook() {
-        // The default prefix for the starter is /callback, so the full URL must be /callback/{botPath}
         String webhookUrl = telegramProperties.webhookBaseUrl() + "/callback/" + telegramProperties.token();
         return SetWebhook.builder()
                 .url(webhookUrl)
@@ -60,7 +59,14 @@ public class TelegramWebhookConfig {
                     });
                     return null;
                 })
-                .setWebhook(setWebhook)
+                .setWebhook(() -> {
+                    try {
+                        telegramClient.execute(setWebhook);
+                        log.info("Webhook registered: {}", setWebhook.getUrl());
+                    } catch (TelegramApiException e) {
+                        log.error("Failed to register webhook at {}: {}", setWebhook.getUrl(), e.getMessage());
+                    }
+                })
                 .deleteWebhook(() -> {
                     try {
                         telegramClient.execute(DeleteWebhook.builder().dropPendingUpdates(true).build());
