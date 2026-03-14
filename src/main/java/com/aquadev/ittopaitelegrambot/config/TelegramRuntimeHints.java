@@ -7,33 +7,34 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 
-public class TelegramRuntimeHints implements RuntimeHintsRegistrar {
+import java.lang.reflect.Field;
 
-    private static final MemberCategory[] ALL_MEMBER_CATEGORIES = {
-            MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
-            MemberCategory.INVOKE_DECLARED_METHODS
-    };
+public class TelegramRuntimeHints implements RuntimeHintsRegistrar {
 
     @Override
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
-        // Scans ALL .class files including inner builder classes (e.g. ApiResponse$ApiResponseBuilder)
-        // which ClassPathScanningCandidateComponentProvider misses
-        registerByPattern(hints, classLoader, "classpath*:org/telegram/telegrambots/**/*.class");
-    }
-
-    private void registerByPattern(RuntimeHints hints, ClassLoader classLoader, String pattern) {
         var resolver = new PathMatchingResourcePatternResolver();
         var metadataFactory = new CachingMetadataReaderFactory(resolver);
         try {
-            for (Resource resource : resolver.getResources(pattern)) {
+            for (Resource resource : resolver.getResources("classpath*:org/telegram/telegrambots/**/*.class")) {
                 try {
                     String className = metadataFactory.getMetadataReader(resource)
                             .getClassMetadata().getClassName();
-                    hints.reflection().registerTypeIfPresent(classLoader, className, ALL_MEMBER_CATEGORIES);
-                } catch (Exception ignored) {
+                    Class<?> clazz = classLoader.loadClass(className);
+
+                    // Constructors and methods for Jackson instantiation and property access
+                    hints.reflection().registerType(clazz,
+                            MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
+                            MemberCategory.INVOKE_DECLARED_METHODS);
+
+                    // Register each field explicitly — replacement for deprecated DECLARED_FIELDS in Spring 7
+                    for (Field field : clazz.getDeclaredFields()) {
+                        hints.reflection().registerField(field);
+                    }
+                } catch (Exception _) {
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception _) {
         }
     }
 }
