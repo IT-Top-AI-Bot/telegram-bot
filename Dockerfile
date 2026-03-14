@@ -6,6 +6,9 @@
 FROM ghcr.io/graalvm/native-image-community:25 AS builder
 WORKDIR /build
 
+# Install musl for fully static binary
+RUN microdnf install -y musl-gcc musl-devel zlib-static && microdnf clean all
+
 COPY gradlew gradlew.bat* ./
 COPY gradle/ gradle/
 RUN chmod +x ./gradlew
@@ -18,9 +21,9 @@ COPY src/ src/
 RUN ./gradlew nativeCompile --no-daemon
 
 ############################
-# Stage: minimal runtime
+# Stage: minimal runtime (no system libs needed for static binary)
 ############################
-FROM gcr.io/distroless/cc-debian12:nonroot
+FROM gcr.io/distroless/static-debian12:nonroot
 WORKDIR /application
 
 COPY --from=builder /build/build/native/nativeCompile/it-top-ai-telegram-bot .
