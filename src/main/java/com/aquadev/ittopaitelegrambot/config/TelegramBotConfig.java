@@ -3,6 +3,7 @@ package com.aquadev.ittopaitelegrambot.config;
 import com.aquadev.ittopaitelegrambot.config.properties.TelegramProperties;
 import lombok.RequiredArgsConstructor;
 import okhttp3.ConnectionPool;
+import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +20,14 @@ public class TelegramBotConfig {
 
     @Bean
     public TelegramClient telegramClient() {
+        Dispatcher dispatcher = new Dispatcher();
+        dispatcher.setMaxRequestsPerHost(20);
+        dispatcher.setMaxRequests(40);
+
         OkHttpClient httpClient = new OkHttpClient.Builder()
-                .connectionPool(new ConnectionPool(10, 6, TimeUnit.MINUTES))
+                .dispatcher(dispatcher)
+                .connectionPool(new ConnectionPool(20, 6, TimeUnit.MINUTES))
+                .pingInterval(25, TimeUnit.SECONDS)
                 .connectTimeout(5, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
