@@ -10,7 +10,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @ConfigurationPropertiesScan
 public class ItTopAiTelegramBotApplication {
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
+        System.setProperty("java.net.preferIPv4Stack", "true");
         SpringApplication.run(ItTopAiTelegramBotApplication.class, args);
     }
 

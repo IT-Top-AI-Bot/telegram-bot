@@ -14,7 +14,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Component
@@ -50,11 +49,11 @@ public class UpdateDispatcher {
 
         CommandHandler handler = commandMap.get(command);
         if (handler != null) {
-            log.info("Dispatching to command handler async: {}", handler.getClass().getSimpleName());
-            CompletableFuture.runAsync(() -> handler.handle(update));
+            log.info("Dispatching to command handler: {}", handler.getClass().getSimpleName());
+            handler.handle(update);
         } else if (registrationStateService.isInProgress(telegramUserId)) {
-            log.info("Dispatching to registration flow handler async for user: {}", telegramUserId);
-            CompletableFuture.runAsync(() -> registrationFlowHandler.handle(update));
+            log.info("Dispatching to registration flow handler for user: {}", telegramUserId);
+            registrationFlowHandler.handle(update);
         } else {
             log.info("No handler found for command: {}", command);
         }
