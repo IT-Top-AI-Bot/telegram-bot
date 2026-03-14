@@ -20,7 +20,7 @@ RUN ./gradlew nativeCompile --no-daemon
 ############################
 # Stage: minimal runtime
 ############################
-FROM gcr.io/distroless/base-debian12:nonroot
+FROM gcr.io/distroless/cc-debian12:nonroot
 WORKDIR /application
 
 COPY --from=builder /build/build/native/nativeCompile/it-top-ai-telegram-bot .
