@@ -43,7 +43,16 @@ public class WebhookTelegramBotConfig {
 
 
     private BotApiMethod<?> handleUpdate(Update update) {
-        executor.submit(() -> updateDispatcher.dispatch(update));
+        log.info("Received Update from Telegram: {}", update);
+
+        executor.submit(() -> {
+            try {
+                updateDispatcher.dispatch(update);
+                log.info("Update dispatched successfully");
+            } catch (Exception e) {
+                log.error("Error while dispatching update", e);
+            }
+        });
 
         return null;
     }
