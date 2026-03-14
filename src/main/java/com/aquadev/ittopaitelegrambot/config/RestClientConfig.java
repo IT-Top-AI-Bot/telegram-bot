@@ -6,7 +6,11 @@ import com.aquadev.ittopaitelegrambot.config.properties.BackendProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+
+import java.net.http.HttpClient;
+import java.time.Duration;
 
 @Configuration
 @RequiredArgsConstructor
@@ -18,10 +22,15 @@ public class RestClientConfig {
 
     @Bean
     public RestClient restClient() {
+        HttpClient httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(5))
+                .build();
+
         return RestClient.builder()
                 .baseUrl(backendProperties.baseUrl())
-                .requestInterceptor(telegramUserIdInterceptor)  // сначала добавляет заголовок
-                .requestInterceptor(backendLoggingInterceptor)  // затем логирует вместе с ним
+                .requestFactory(new JdkClientHttpRequestFactory(httpClient))
+                .requestInterceptor(telegramUserIdInterceptor)
+                .requestInterceptor(backendLoggingInterceptor)
                 .build();
     }
 }
