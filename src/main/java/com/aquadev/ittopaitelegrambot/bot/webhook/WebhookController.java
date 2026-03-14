@@ -29,16 +29,19 @@ public class WebhookController {
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     @PostMapping("/webhook/{token}")
-    public ResponseEntity<Void> onUpdate(@PathVariable String token, @RequestBody String body) {
+    public ResponseEntity<Void> onUpdate(@PathVariable String token, @RequestBody byte[] body) {
         if (!telegramProperties.token().equals(token)) {
+            log.warn("Webhook called with invalid token");
             return ResponseEntity.status(403).build();
         }
+        String json = new String(body, java.nio.charset.StandardCharsets.UTF_8);
+        log.debug("Webhook update received: {}", json);
         executor.submit(() -> {
             try {
-                Update update = telegramObjectMapper.readValue(body, Update.class);
+                Update update = telegramObjectMapper.readValue(json, Update.class);
                 updateDispatcher.dispatch(update);
             } catch (Exception e) {
-                log.error("Failed to deserialize webhook update", e);
+                log.error("Failed to process webhook update", e);
             }
         });
         return ResponseEntity.ok().build();
