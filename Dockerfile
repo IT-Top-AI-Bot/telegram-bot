@@ -1,35 +1,36 @@
 # syntax=docker/dockerfile:1.7
 
 ############################
-# Stage: Native compilation with Azul NIK 25
+# Stage: extract layers from pre-built JAR
 ############################
-FROM azul/nik:25-jdk AS builder
-WORKDIR /build
-
-# Copy Gradle wrapper and build descriptors first — cached until they change
-COPY gradlew settings.gradle.kts build.gradle.kts ./
-COPY gradle/ gradle/
-RUN chmod +x gradlew && ./gradlew dependencies --no-daemon --quiet
-
-# Copy sources and compile native binary
-COPY src/ src/
-RUN ./gradlew nativeCompile -x test --no-daemon
-
-############################
-# Stage: Minimal runtime (no JVM required)
-############################
-FROM ubuntu:24.04
+FROM eclipse-temurin:25-jdk AS extractor
 WORKDIR /application
 
-RUN groupadd -r spring && useradd -r -g spring spring \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+COPY build/libs/*.jar application.jar
 
+RUN java -Djarmode=tools -jar application.jar extract --layers --launcher --destination extracted
+
+############################
+# Stage: final runtime image
+############################
+FROM eclipse-temurin:25-jre-alpine
+WORKDIR /application
+
+RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
-COPY --from=builder /build/build/native/nativeCompile/tg-bot ./app
+VOLUME ["/tmp"]
+
+COPY --from=extractor /application/extracted/dependencies/ ./
+COPY --from=extractor /application/extracted/spring-boot-loader/ ./
+COPY --from=extractor /application/extracted/snapshot-dependencies/ ./
+COPY --from=extractor /application/extracted/application/ ./
 
 EXPOSE 8080
 
-ENTRYPOINT ["./app", "-Djava.net.preferIPv4Stack=true"]
+ENTRYPOINT ["java", \
+  "-XX:+UseZGC", \
+  "-XX:MaxRAMPercentage=75.0", \
+  "-XX:+AlwaysPreTouch", \
+  "-Djava.net.preferIPv4Stack=true", \
+  "org.springframework.boot.loader.launch.JarLauncher"]
