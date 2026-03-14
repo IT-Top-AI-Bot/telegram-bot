@@ -51,9 +51,9 @@ public class TelegramWebhookConfig {
 
     @Bean
     public SpringTelegramWebhookBot webhookBot(SetWebhook setWebhook) {
-        log.info("Creating SpringTelegramWebhookBot with botPath: tg");
+        log.info("Creating SpringTelegramWebhookBot with botPath: callback/tg");
         return SpringTelegramWebhookBot.builder()
-                .botPath("tg") // Full mapping is /callback/tg
+                .botPath("callback/tg") // Mapping will be /callback/tg
                 .updateHandler(update -> {
                     executor.submit(() -> {
                         try {
