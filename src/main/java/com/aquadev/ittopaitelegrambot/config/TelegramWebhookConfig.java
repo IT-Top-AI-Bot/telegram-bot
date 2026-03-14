@@ -51,7 +51,7 @@ public class TelegramWebhookConfig {
                         telegramClient.execute(SetWebhook.builder().url(webhookUrl).build());
                         log.info("Webhook registered: {}", webhookUrl);
                     } catch (TelegramApiException e) {
-                        throw new RuntimeException("Failed to register webhook", e);
+                        log.error("Failed to register webhook at {}: {}", webhookUrl, e.getMessage());
                     }
                 })
                 .deleteWebhook(() -> {
