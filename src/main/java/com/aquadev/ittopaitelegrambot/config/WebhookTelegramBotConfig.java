@@ -20,30 +20,35 @@ import java.util.concurrent.Executors;
 
 @Slf4j
 @Configuration
-@Profile("kubernetes") // Активируется только в k8s среде
+@Profile("kubernetes")
 @RequiredArgsConstructor
 public class WebhookTelegramBotConfig {
 
     private final TelegramProperties telegramProperties;
     private final UpdateDispatcher updateDispatcher;
-
     private final TelegramClient telegramClient;
-
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     @Bean
     public SpringTelegramWebhookBot springTelegramWebhookBot() {
+        String path = telegramProperties.webhookPath();
+        // ВАЖНО: Библиотека может ожидать путь БЕЗ ведущего слэша для регистрации эндпоинта в MVC
+        if (path != null && path.startsWith("/")) {
+            path = path.substring(1);
+        }
+
+        log.info("Configuring SpringTelegramWebhookBot with path: {}", path);
+
         return SpringTelegramWebhookBot.builder()
-                .botPath(telegramProperties.webhookPath())
+                .botPath(path)
                 .updateHandler(this::handleUpdate)
                 .setWebhook(this::registerWebhook)
                 .deleteWebhook(this::removeWebhook)
                 .build();
     }
 
-
     private BotApiMethod<?> handleUpdate(Update update) {
-        log.info("Received Update from Telegram: {}", update);
+        log.info("Received Update from Telegram: {}", update.getUpdateId());
 
         executor.submit(() -> {
             try {
@@ -70,11 +75,10 @@ public class WebhookTelegramBotConfig {
         }
     }
 
-
     private void removeWebhook() {
         try {
             DeleteWebhook deleteWebhook = DeleteWebhook.builder()
-                    .dropPendingUpdates(false) // false, чтобы не потерять сообщения при рестарте пода
+                    .dropPendingUpdates(false)
                     .build();
             telegramClient.execute(deleteWebhook);
             log.info("Webhook successfully deleted");
