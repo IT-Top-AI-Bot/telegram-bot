@@ -13,7 +13,7 @@ telegram:
   bot:
     token: ${TELEGRAM_BOT_TOKEN}
     username: ${TELEGRAM_BOT_USERNAME}
-    webhook-path: "bot"
+    webhook-path: "/callback/bot"
     webhook-base-url: ""   # переопределяется в application-kubernetes.yaml
 
 backend:
