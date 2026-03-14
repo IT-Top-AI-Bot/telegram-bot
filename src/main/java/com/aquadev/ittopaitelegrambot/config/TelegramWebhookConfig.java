@@ -5,6 +5,7 @@ import com.aquadev.ittopaitelegrambot.config.properties.TelegramProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -39,21 +40,13 @@ public class TelegramWebhookConfig {
 
     @Bean
     public SpringTelegramWebhookBot webhookBot() {
-        String webhookUrl = telegramProperties.webhookBaseUrl() + "/" + telegramProperties.token();
         return SpringTelegramWebhookBot.builder()
                 .botPath(telegramProperties.token())
                 .updateHandler(update -> {
                     executor.submit(() -> updateDispatcher.dispatch(update));
                     return null;
                 })
-                .setWebhook(() -> {
-                    try {
-                        telegramClient.execute(SetWebhook.builder().url(webhookUrl).build());
-                        log.info("Webhook registered: {}", webhookUrl);
-                    } catch (TelegramApiException e) {
-                        log.error("Failed to register webhook at {}: {}", webhookUrl, e.getMessage());
-                    }
-                })
+                .setWebhook(null)    // registered after server starts — see webhookRegistrar()
                 .deleteWebhook(() -> {
                     try {
                         telegramClient.execute(DeleteWebhook.builder().dropPendingUpdates(true).build());
@@ -63,6 +56,19 @@ public class TelegramWebhookConfig {
                     }
                 })
                 .build();
+    }
+
+    @Bean
+    public ApplicationRunner webhookRegistrar() {
+        return args -> {
+            String webhookUrl = telegramProperties.webhookBaseUrl() + "/" + telegramProperties.token();
+            try {
+                telegramClient.execute(SetWebhook.builder().url(webhookUrl).build());
+                log.info("Webhook registered: {}", webhookUrl);
+            } catch (TelegramApiException e) {
+                log.error("Failed to register webhook at {}: {}", webhookUrl, e.getMessage());
+            }
+        };
     }
 
     /**
