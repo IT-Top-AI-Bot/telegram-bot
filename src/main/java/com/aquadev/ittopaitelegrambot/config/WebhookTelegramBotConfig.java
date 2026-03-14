@@ -31,9 +31,10 @@ public class WebhookTelegramBotConfig {
 
     @Bean
     public SpringTelegramWebhookBot springTelegramWebhookBot() {
-        // Библиотека по умолчанию добавляет /callback к пути из telegram.webhook-url.path
-        // Если telegram.webhook-url.path пуст, префикс будет /callback
-        String path = telegramProperties.webhookPath();
+        // РЕШЕНИЕ: Указываем полный путь от корня приложения,
+        // так как библиотека регистрирует эндпоинт по этому пути буквально.
+        // Если мы хотим /callback/bot, то и пишем "callback/bot"
+        String path = "callback/bot";
         log.info("Configuring SpringTelegramWebhookBot with path: {}", path);
 
         return SpringTelegramWebhookBot.builder()
@@ -46,8 +47,8 @@ public class WebhookTelegramBotConfig {
     public CommandLineRunner registerWebhookOnStartup() {
         return args -> {
             try {
-                // Полный URL для Telegram
-                String webhookUrl = telegramProperties.webhookBaseUrl();
+                // Telegram должен слать сюда
+                String webhookUrl = "https://tg-bot-dev.actimate.ru/callback/bot";
                 log.info("Manually registering webhook URL in Telegram: {}", webhookUrl);
 
                 SetWebhook setWebhook = SetWebhook.builder()
