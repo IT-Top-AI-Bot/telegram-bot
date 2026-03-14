@@ -5,9 +5,12 @@ import com.aquadev.ittopaitelegrambot.config.properties.TelegramProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -38,7 +41,8 @@ public class TelegramWebhookConfig {
 
     @Bean
     public SetWebhook setWebhook() {
-        String webhookUrl = telegramProperties.webhookBaseUrl() + "/callback/" + telegramProperties.token();
+        // Starter uses /callback/{botPath}
+        String webhookUrl = telegramProperties.webhookBaseUrl() + "/callback/tg";
         return SetWebhook.builder()
                 .url(webhookUrl)
                 .dropPendingUpdates(true)
@@ -48,7 +52,7 @@ public class TelegramWebhookConfig {
     @Bean
     public SpringTelegramWebhookBot webhookBot(SetWebhook setWebhook) {
         return SpringTelegramWebhookBot.builder()
-                .botPath(telegramProperties.token())
+                .botPath("tg") // Avoid colon in path
                 .updateHandler(update -> {
                     executor.submit(() -> {
                         try {
@@ -79,38 +83,30 @@ public class TelegramWebhookConfig {
     }
 
     /**
-     * Jackson 2.x converter for telegrambots Update deserialization.
-     * Spring Boot 4.x uses Jackson 3.x (tools.jackson) which is incompatible
-     * with telegrambots 9.x Jackson 2.x annotations on model classes.
+     * Custom converter for Telegram Update objects using Jackson 2.x.
+     * We extend AbstractHttpMessageConverter directly to avoid using the deprecated
+     * MappingJackson2HttpMessageConverter in Spring 7.0 / Boot 4.0.
      */
     @Bean
-    @org.springframework.core.annotation.Order(org.springframework.core.Ordered.HIGHEST_PRECEDENCE)
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     public HttpMessageConverter<Update> telegramUpdateConverter() {
         return new AbstractHttpMessageConverter<>(MediaType.APPLICATION_JSON) {
             private final ObjectMapper mapper = new ObjectMapper();
 
             @Override
-            protected boolean supports(Class<?> clazz) {
+            protected boolean supports(@NonNull Class<?> clazz) {
                 return Update.class.isAssignableFrom(clazz);
             }
 
             @Override
-            protected Update readInternal(Class<? extends Update> clazz, HttpInputMessage inputMessage)
+            protected Update readInternal(@NonNull Class<? extends Update> clazz, @NonNull HttpInputMessage inputMessage)
                     throws IOException {
-                log.info("Converting incoming update using telegramUpdateConverter...");
-                try {
-                    Update update = mapper.readValue(inputMessage.getBody(), clazz);
-                    log.info("Successfully converted update: {}", update.getUpdateId());
-                    return update;
-                } catch (Exception e) {
-                    log.error("Failed to convert update: {}", e.getMessage(), e);
-                    throw e;
-                }
+                return mapper.readValue(inputMessage.getBody(), clazz);
             }
 
             @Override
-            protected void writeInternal(Update update, HttpOutputMessage outputMessage) {
-                throw new UnsupportedOperationException();
+            protected void writeInternal(Update update, @NonNull HttpOutputMessage outputMessage) {
+                throw new UnsupportedOperationException("Write is not supported");
             }
         };
     }
