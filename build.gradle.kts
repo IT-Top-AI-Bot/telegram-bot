@@ -2,6 +2,7 @@ plugins {
     java
     id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.graalvm.buildtools.native") version "0.10.6"
 }
 
 group = "com.aquadev"
@@ -39,6 +40,19 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+    }
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            imageName.set("tg-bot")
+            buildArgs.addAll(
+                "--no-fallback",
+                "-H:+ReportExceptionStackTraces",
+                "-J-Xmx6g"
+            )
+        }
     }
 }
 
