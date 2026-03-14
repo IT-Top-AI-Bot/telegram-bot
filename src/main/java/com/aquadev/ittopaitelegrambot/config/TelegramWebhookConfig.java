@@ -41,7 +41,7 @@ public class TelegramWebhookConfig {
 
     @Bean
     public SetWebhook setWebhook() {
-        // Starter uses /callback/{botPath}
+        // Must match the server configuration: /callback/tg
         String webhookUrl = telegramProperties.webhookBaseUrl() + "/callback/tg";
         return SetWebhook.builder()
                 .url(webhookUrl)
@@ -52,7 +52,7 @@ public class TelegramWebhookConfig {
     @Bean
     public SpringTelegramWebhookBot webhookBot(SetWebhook setWebhook) {
         return SpringTelegramWebhookBot.builder()
-                .botPath("tg") // Avoid colon in path
+                .botPath("tg") // Full mapping is /callback/tg
                 .updateHandler(update -> {
                     executor.submit(() -> {
                         try {
@@ -66,17 +66,17 @@ public class TelegramWebhookConfig {
                 .setWebhook(() -> {
                     try {
                         telegramClient.execute(setWebhook);
-                        log.info("Webhook registered: {}", setWebhook.getUrl());
+                        log.info("Webhook registered via starter: {}", setWebhook.getUrl());
                     } catch (TelegramApiException e) {
-                        log.error("Failed to register webhook at {}: {}", setWebhook.getUrl(), e.getMessage());
+                        log.error("Failed to register webhook via starter at {}: {}", setWebhook.getUrl(), e.getMessage());
                     }
                 })
                 .deleteWebhook(() -> {
                     try {
                         telegramClient.execute(DeleteWebhook.builder().dropPendingUpdates(true).build());
-                        log.info("Webhook deleted");
+                        log.info("Webhook deleted via starter");
                     } catch (TelegramApiException e) {
-                        log.error("Failed to delete webhook", e);
+                        log.error("Failed to delete webhook via starter", e);
                     }
                 })
                 .build();
