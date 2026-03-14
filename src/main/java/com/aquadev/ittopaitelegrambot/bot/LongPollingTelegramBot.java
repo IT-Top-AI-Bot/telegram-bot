@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 @Component
 @Profile("!kubernetes")
 @RequiredArgsConstructor
-public class TelegramBot implements SpringLongPollingBot, LongPollingUpdateConsumer {
+public class LongPollingTelegramBot implements SpringLongPollingBot, LongPollingUpdateConsumer {
 
     private final TelegramProperties telegramProperties;
     private final UpdateDispatcher updateDispatcher;
