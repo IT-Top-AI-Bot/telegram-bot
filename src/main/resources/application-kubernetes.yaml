@@ -1,8 +1,3 @@
-spring:
-  autoconfigure:
-    exclude:
-      - org.telegram.telegrambots.longpolling.starter.TelegramBotStarterConfiguration
-
 backend:
   base-url: http://api-gateway-dev.dev.svc.cluster.local:8080
 

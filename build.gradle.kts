@@ -1,6 +1,6 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.5.11"
+    id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.graalvm.buildtools.native") version "0.11.5"
 }
@@ -28,12 +28,12 @@ repositories {
 }
 
 val telegramBotsVersion = "9.5.0"
-val springCloudVersion by extra("2025.0.1")
+val springCloudVersion by extra("2025.1.1")
 
 val localImplementation by configurations.getting
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("org.springframework.boot:spring-boot-starter-aspectj")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-all")
     implementation("org.telegram:telegrambots-springboot-webhook-starter:$telegramBotsVersion")
