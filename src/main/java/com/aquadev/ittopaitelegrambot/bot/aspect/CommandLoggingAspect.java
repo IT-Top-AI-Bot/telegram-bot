@@ -33,7 +33,7 @@ public class CommandLoggingAspect {
             log.info("Command [{}] from {} (id={}) executed in {} ms",
                     command, username, userId, System.currentTimeMillis() - start);
             return result;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("Command [{}] from {} (id={}) failed in {} ms: {}",
                     command, username, userId, System.currentTimeMillis() - start, e.getMessage());
             exceptionHandler.handle(update, e);

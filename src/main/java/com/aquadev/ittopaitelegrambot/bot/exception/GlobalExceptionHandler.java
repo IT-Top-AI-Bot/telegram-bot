@@ -15,9 +15,9 @@ public class GlobalExceptionHandler {
 
     private final TelegramClient telegramClient;
 
-    public void handle(Update update, Exception e) {
-        if (e instanceof TelegramApiException) {
-            handleTelegramApiException(update, (TelegramApiException) e);
+    public void handle(Update update, Throwable e) {
+        if (e instanceof TelegramApiException telegramEx) {
+            handleTelegramApiException(update, telegramEx);
         } else {
             handleGenericException(update, e);
         }
@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
         log.error("Telegram API error while processing update: {}", e.getMessage());
     }
 
-    private void handleGenericException(Update update, Exception e) {
+    private void handleGenericException(Update update, Throwable e) {
         long chatId = update.getMessage().getChatId();
         sendErrorReply(chatId);
     }

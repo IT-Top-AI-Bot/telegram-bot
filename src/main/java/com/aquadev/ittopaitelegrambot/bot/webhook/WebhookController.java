@@ -49,7 +49,7 @@ public class WebhookController {
             executor.submit(() -> {
                 try {
                     updateDispatcher.dispatch(update);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     log.error("Error dispatching update", e);
                 }
             });

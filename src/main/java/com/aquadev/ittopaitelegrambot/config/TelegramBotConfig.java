@@ -26,8 +26,8 @@ public class TelegramBotConfig {
 
         OkHttpClient httpClient = new OkHttpClient.Builder()
                 .dispatcher(dispatcher)
-                .connectionPool(new ConnectionPool(20, 6, TimeUnit.MINUTES))
-                .pingInterval(25, TimeUnit.SECONDS)
+                // keepAlive < Kubernetes NAT idle timeout (~60-90s) to avoid stale connections
+                .connectionPool(new ConnectionPool(20, 55, TimeUnit.SECONDS))
                 .connectTimeout(5, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
