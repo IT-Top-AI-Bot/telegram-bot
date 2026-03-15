@@ -11,30 +11,33 @@ import java.lang.reflect.Field;
 
 public class TelegramRuntimeHints implements RuntimeHintsRegistrar {
 
+    private static final String[] SCAN_PATTERNS = {
+            "classpath*:org/telegram/telegrambots/**/*.class",
+            "classpath*:com/aquadev/ittopaitelegrambot/client/dto/**/*.class"
+    };
+
     @Override
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
         var resolver = new PathMatchingResourcePatternResolver();
         var metadataFactory = new CachingMetadataReaderFactory(resolver);
-        try {
-            for (Resource resource : resolver.getResources("classpath*:org/telegram/telegrambots/**/*.class")) {
-                try {
-                    String className = metadataFactory.getMetadataReader(resource)
-                            .getClassMetadata().getClassName();
-                    Class<?> clazz = classLoader.loadClass(className);
-
-                    // Constructors and methods for Jackson instantiation and property access
-                    hints.reflection().registerType(clazz,
-                            MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
-                            MemberCategory.INVOKE_DECLARED_METHODS);
-
-                    // Register each field explicitly — replacement for deprecated DECLARED_FIELDS in Spring 7
-                    for (Field field : clazz.getDeclaredFields()) {
-                        hints.reflection().registerField(field);
+        for (String pattern : SCAN_PATTERNS) {
+            try {
+                for (Resource resource : resolver.getResources(pattern)) {
+                    try {
+                        String className = metadataFactory.getMetadataReader(resource)
+                                .getClassMetadata().getClassName();
+                        Class<?> clazz = classLoader.loadClass(className);
+                        hints.reflection().registerType(clazz,
+                                MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
+                                MemberCategory.INVOKE_DECLARED_METHODS);
+                        for (Field field : clazz.getDeclaredFields()) {
+                            hints.reflection().registerField(field);
+                        }
+                    } catch (Exception _) {
                     }
-                } catch (Exception _) {
                 }
+            } catch (Exception _) {
             }
-        } catch (Exception _) {
         }
     }
 }
