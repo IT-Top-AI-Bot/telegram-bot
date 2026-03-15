@@ -1,22 +1,19 @@
 package com.aquadev.ittopaitelegrambot.config;
 
+import com.aquadev.ittopaitelegrambot.bot.BotCommandsRegistrar;
 import com.aquadev.ittopaitelegrambot.bot.dispatcher.UpdateDispatcher;
+import com.aquadev.ittopaitelegrambot.config.properties.TelegramProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportRuntimeHints;
 import org.springframework.context.annotation.Profile;
 import org.telegram.telegrambots.meta.api.methods.updates.DeleteWebhook;
-import org.telegram.telegrambots.meta.api.methods.updates.GetWebhookInfo;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
-import org.telegram.telegrambots.meta.api.objects.WebhookInfo;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrambots.webhook.starter.SpringTelegramWebhookBot;
-
-import java.util.List;
 
 @Slf4j
 @Configuration
@@ -27,17 +24,13 @@ public class WebhookTelegramBotConfig {
 
     private final TelegramClient telegramClient;
     private final UpdateDispatcher updateDispatcher;
-
-    @Value("${telegram.bot.webhook-path}")
-    private String webhookPath;
-
-    @Value("${telegram.bot.webhook-base-url}")
-    private String webhookBaseUrl;
+    private final TelegramProperties telegramProperties;
+    private final BotCommandsRegistrar botCommandsRegistrar;
 
     @Bean
     public SpringTelegramWebhookBot telegramWebhookBot() {
         return SpringTelegramWebhookBot.builder()
-                .botPath(webhookPath)
+                .botPath(telegramProperties.webhook().path())
                 .updateHandler(update -> {
                     updateDispatcher.dispatch(update);
                     return null;
@@ -49,22 +42,15 @@ public class WebhookTelegramBotConfig {
 
     private void registerWebhook() {
         try {
-            log.info("Attempting to register webhook: {}", webhookBaseUrl);
             boolean success = telegramClient.execute(
                     SetWebhook.builder()
-                            .url(webhookBaseUrl)
-                            .maxConnections(100)
-                            .allowedUpdates(List.of("message", "callback_query"))
+                            .url(telegramProperties.webhook().url())
+                            .secretToken(telegramProperties.webhook().secretToken())
                             .build()
             );
             log.info("SetWebhook execution status: {}", success);
-
-            WebhookInfo info = telegramClient.execute(new GetWebhookInfo());
-            log.info("Current Telegram Webhook state: URL='{}', pending_updates={}", info.getUrl(), info.getPendingUpdatesCount());
-
-            if (info.getUrl() == null || info.getUrl().isBlank()) {
-                log.warn("WARNING: Webhook URL is EMPTY in Telegram after registration!");
-            }
+            log.info("Webhook registered: {}", telegramProperties.webhook().url());
+            botCommandsRegistrar.run(null);
         } catch (TelegramApiException e) {
             log.error("CRITICAL: Failed to register webhook on startup", e);
         }
@@ -72,10 +58,10 @@ public class WebhookTelegramBotConfig {
 
     private void deleteWebhook() {
         try {
-            telegramClient.execute(new DeleteWebhook());
+            telegramClient.execute(DeleteWebhook.builder().build());
             log.info("Webhook deleted");
-        } catch (TelegramApiException e) {
-            log.error("Failed to delete webhook on shutdown", e);
+        } catch (Exception e) {
+            log.error("Failed to delete webhook on shutdown: {}", e.getMessage());
         }
     }
 }

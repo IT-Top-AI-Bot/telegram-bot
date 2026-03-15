@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
@@ -19,12 +18,11 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class BotCommandsRegistrar implements ApplicationRunner {
+public class BotCommandsRegistrar {
 
     private final TelegramClient telegramClient;
     private final List<CommandHandler> handlers;
 
-    @Override
     public void run(ApplicationArguments args) {
         List<BotCommand> commands = new ArrayList<>();
 
