@@ -6,11 +6,6 @@ spring:
 backend:
   base-url: http://api-gateway-dev.dev.svc.cluster.local:8080
 
-telegram:
-  bot:
-    webhook-path: "bot"
-    webhook-base-url: "https://tg-bot-dev.actimate.ru/bot"
-
 management:
   endpoints:
     web:

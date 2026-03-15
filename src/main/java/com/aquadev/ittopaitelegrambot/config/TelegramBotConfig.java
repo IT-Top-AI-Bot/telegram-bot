@@ -11,7 +11,6 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.util.concurrent.TimeUnit;
 
 @Configuration
 @RequiredArgsConstructor
@@ -22,10 +21,7 @@ public class TelegramBotConfig {
 
     @Bean
     public TelegramClient telegramClient() {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
-                .writeTimeout(15, TimeUnit.SECONDS);
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
         if (proxyProperties.isEnabled()) {
             builder.proxy(new Proxy(
