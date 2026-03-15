@@ -18,6 +18,10 @@ public class GlobalExceptionHandler {
     public void handle(Update update, Throwable e) {
         if (e instanceof TelegramApiException telegramEx) {
             handleTelegramApiException(update, telegramEx);
+        } else if (e.getCause() instanceof TelegramApiException telegramEx) {
+            // RuntimeException wrapping TelegramApiException — message was likely delivered,
+            // just Telegram API didn't return HTTP response in time
+            handleTelegramApiException(update, telegramEx);
         } else {
             handleGenericException(update, e);
         }
