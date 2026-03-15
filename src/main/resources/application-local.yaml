@@ -1,0 +1,4 @@
+spring:
+  autoconfigure:
+    exclude:
+      - org.telegram.telegrambots.webhook.starter.TelegramBotStarterConfiguration

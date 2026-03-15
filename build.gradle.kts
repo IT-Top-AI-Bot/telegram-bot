@@ -1,6 +1,6 @@
 plugins {
     java
-    id("org.springframework.boot") version "4.0.3"
+    id("org.springframework.boot") version "3.5.11"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.graalvm.buildtools.native") version "0.11.5"
 }
@@ -20,10 +20,10 @@ repositories {
 }
 
 val telegramBotsVersion = "9.4.0"
-val springCloudVersion by extra("2025.1.1")
+val springCloudVersion by extra("2025.0.1")
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-aspectj")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-all")
     implementation("org.telegram:telegrambots-springboot-longpolling-starter:$telegramBotsVersion")
@@ -31,7 +31,6 @@ dependencies {
     implementation("org.telegram:telegrambots-client:$telegramBotsVersion")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
