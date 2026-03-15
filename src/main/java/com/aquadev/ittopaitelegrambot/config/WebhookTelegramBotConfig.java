@@ -54,6 +54,4 @@ public class WebhookTelegramBotConfig {
             log.error("CRITICAL: Failed to register webhook on startup", e);
         }
     }
-
-
 }
