@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportRuntimeHints;
 import org.springframework.context.annotation.Profile;
 import org.telegram.telegrambots.meta.api.methods.updates.DeleteWebhook;
+import org.telegram.telegrambots.meta.api.methods.updates.GetWebhookInfo;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
+import org.telegram.telegrambots.meta.api.objects.WebhookInfo;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import org.telegram.telegrambots.webhook.starter.SpringTelegramWebhookBot;
@@ -47,17 +49,24 @@ public class WebhookTelegramBotConfig {
 
     private void registerWebhook() {
         try {
-            log.info("Registering webhook URL in Telegram: {}", webhookBaseUrl);
-            telegramClient.execute(
+            log.info("Attempting to register webhook: {}", webhookBaseUrl);
+            boolean success = telegramClient.execute(
                     SetWebhook.builder()
                             .url(webhookBaseUrl)
                             .maxConnections(100)
                             .allowedUpdates(List.of("message", "callback_query"))
                             .build()
             );
-            log.info("Webhook successfully registered!");
+            log.info("SetWebhook execution status: {}", success);
+
+            WebhookInfo info = telegramClient.execute(new GetWebhookInfo());
+            log.info("Current Telegram Webhook state: URL='{}', pending_updates={}", info.getUrl(), info.getPendingUpdatesCount());
+
+            if (info.getUrl() == null || info.getUrl().isBlank()) {
+                log.warn("WARNING: Webhook URL is EMPTY in Telegram after registration!");
+            }
         } catch (TelegramApiException e) {
-            log.error("Failed to register webhook on startup", e);
+            log.error("CRITICAL: Failed to register webhook on startup", e);
         }
     }
 
