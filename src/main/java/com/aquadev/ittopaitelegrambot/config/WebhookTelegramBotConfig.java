@@ -5,10 +5,12 @@ import com.aquadev.ittopaitelegrambot.bot.dispatcher.UpdateDispatcher;
 import com.aquadev.ittopaitelegrambot.config.properties.TelegramProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportRuntimeHints;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.event.EventListener;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
@@ -34,12 +36,14 @@ public class WebhookTelegramBotConfig {
                     updateDispatcher.dispatch(update);
                     return null;
                 })
-                .setWebhook(this::registerWebhook)
+                .setWebhook(() -> {
+                })
                 .deleteWebhook(() -> log.info("Skipping webhook deletion to preserve webhook during rolling updates"))
                 .build();
     }
 
-    private void registerWebhook() {
+    @EventListener(ApplicationReadyEvent.class)
+    public void registerWebhook() {
         try {
             boolean success = telegramClient.execute(
                     SetWebhook.builder()
