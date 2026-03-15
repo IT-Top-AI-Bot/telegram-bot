@@ -7,7 +7,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 
-import java.lang.reflect.Field;
 
 public class TelegramRuntimeHints implements RuntimeHintsRegistrar {
 
@@ -28,11 +27,12 @@ public class TelegramRuntimeHints implements RuntimeHintsRegistrar {
                                 .getClassMetadata().getClassName();
                         Class<?> clazz = classLoader.loadClass(className);
                         hints.reflection().registerType(clazz,
+                                MemberCategory.DECLARED_FIELDS,
+                                MemberCategory.INTROSPECT_DECLARED_CONSTRUCTORS,
                                 MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
-                                MemberCategory.INVOKE_DECLARED_METHODS);
-                        for (Field field : clazz.getDeclaredFields()) {
-                            hints.reflection().registerField(field);
-                        }
+                                MemberCategory.INTROSPECT_DECLARED_METHODS,
+                                MemberCategory.INVOKE_DECLARED_METHODS,
+                                MemberCategory.DECLARED_CLASSES);
                     } catch (Exception _) {
                     }
                 }

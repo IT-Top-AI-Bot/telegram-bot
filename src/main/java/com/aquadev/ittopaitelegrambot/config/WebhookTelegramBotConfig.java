@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportRuntimeHints;
 import org.springframework.context.annotation.Profile;
-import org.telegram.telegrambots.meta.api.methods.updates.DeleteWebhook;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
@@ -36,7 +35,7 @@ public class WebhookTelegramBotConfig {
                     return null;
                 })
                 .setWebhook(this::registerWebhook)
-                .deleteWebhook(this::deleteWebhook)
+                .deleteWebhook(() -> log.info("Skipping webhook deletion to preserve webhook during rolling updates"))
                 .build();
     }
 
@@ -56,12 +55,5 @@ public class WebhookTelegramBotConfig {
         }
     }
 
-    private void deleteWebhook() {
-        try {
-            telegramClient.execute(DeleteWebhook.builder().build());
-            log.info("Webhook deleted");
-        } catch (Exception e) {
-            log.error("Failed to delete webhook on shutdown: {}", e.getMessage());
-        }
-    }
+
 }
