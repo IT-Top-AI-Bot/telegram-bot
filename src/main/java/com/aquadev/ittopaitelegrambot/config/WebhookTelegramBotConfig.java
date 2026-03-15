@@ -4,6 +4,7 @@ import com.aquadev.ittopaitelegrambot.bot.dispatcher.UpdateDispatcher;
 import com.aquadev.ittopaitelegrambot.config.properties.TelegramProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportRuntimeHints;
@@ -27,20 +28,26 @@ public class WebhookTelegramBotConfig {
     private final TelegramClient telegramClient;
     private final UpdateDispatcher updateDispatcher;
 
+    @Value("${telegram.bot.webhook-path}")
+    private String webhookPath;
+
+    @Value("${telegram.bot.webhook-base-url}")
+    private String webhookBaseUrl;
+
     @Bean
-    public SpringTelegramWebhookBot webhookBot() {
+    public SpringTelegramWebhookBot telegramWebhookBot() {
+        log.info("Creating SpringTelegramWebhookBot with botPath: '{}' and baseUrl: '{}'", webhookPath, webhookBaseUrl);
         return SpringTelegramWebhookBot.builder()
-                .botPath(telegramProperties.webhookPath())
+                .botPath(webhookPath)
                 .updateHandler(update -> {
                     updateDispatcher.dispatch(update);
                     return null;
                 })
                 .setWebhook(() -> {
                     try {
-                        String webhookUrl = telegramProperties.webhookBaseUrl();
-                        log.info("Registering webhook URL in Telegram: {}", webhookUrl);
+                        log.info("Registering webhook URL in Telegram: {}", webhookBaseUrl);
                         telegramClient.execute(SetWebhook.builder()
-                                .url(webhookUrl)
+                                .url(webhookBaseUrl)
                                 .maxConnections(100)
                                 .allowedUpdates(List.of("message", "callback_query"))
                                 .build());

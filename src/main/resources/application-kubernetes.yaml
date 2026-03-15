@@ -8,5 +8,5 @@ backend:
 
 telegram:
   bot:
-    webhook-path: "/callback/bot"
-    webhook-base-url: "https://tg-bot-dev.actimate.ru/callback/bot"
+    webhook-path: "bot"
+    webhook-base-url: "https://tg-bot-dev.actimate.ru/bot"
