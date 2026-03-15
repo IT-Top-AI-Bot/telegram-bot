@@ -10,3 +10,9 @@ telegram:
   bot:
     webhook-path: "bot"
     webhook-base-url: "https://tg-bot-dev.actimate.ru/bot"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,mappings
