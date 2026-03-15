@@ -1,7 +1,6 @@
 package com.aquadev.ittopaitelegrambot.config;
 
 import com.aquadev.ittopaitelegrambot.bot.dispatcher.UpdateDispatcher;
-import com.aquadev.ittopaitelegrambot.config.properties.TelegramProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +23,6 @@ import java.util.List;
 @ImportRuntimeHints(TelegramRuntimeHints.class)
 public class WebhookTelegramBotConfig {
 
-    private final TelegramProperties telegramProperties;
     private final TelegramClient telegramClient;
     private final UpdateDispatcher updateDispatcher;
 
@@ -36,34 +34,39 @@ public class WebhookTelegramBotConfig {
 
     @Bean
     public SpringTelegramWebhookBot telegramWebhookBot() {
-        log.info("Creating SpringTelegramWebhookBot with botPath: '{}' and baseUrl: '{}'", webhookPath, webhookBaseUrl);
         return SpringTelegramWebhookBot.builder()
                 .botPath(webhookPath)
                 .updateHandler(update -> {
                     updateDispatcher.dispatch(update);
                     return null;
                 })
-                .setWebhook(() -> {
-                    try {
-                        log.info("Registering webhook URL in Telegram: {}", webhookBaseUrl);
-                        telegramClient.execute(SetWebhook.builder()
-                                .url(webhookBaseUrl)
-                                .maxConnections(100)
-                                .allowedUpdates(List.of("message", "callback_query"))
-                                .build());
-                        log.info("Webhook successfully registered!");
-                    } catch (TelegramApiException e) {
-                        log.error("Failed to register webhook on startup", e);
-                    }
-                })
-                .deleteWebhook(() -> {
-                    try {
-                        telegramClient.execute(new DeleteWebhook());
-                        log.info("Webhook deleted");
-                    } catch (TelegramApiException e) {
-                        log.error("Failed to delete webhook on shutdown", e);
-                    }
-                })
+                .setWebhook(this::registerWebhook)
+                .deleteWebhook(this::deleteWebhook)
                 .build();
+    }
+
+    private void registerWebhook() {
+        try {
+            log.info("Registering webhook URL in Telegram: {}", webhookBaseUrl);
+            telegramClient.execute(
+                    SetWebhook.builder()
+                            .url(webhookBaseUrl)
+                            .maxConnections(100)
+                            .allowedUpdates(List.of("message", "callback_query"))
+                            .build()
+            );
+            log.info("Webhook successfully registered!");
+        } catch (TelegramApiException e) {
+            log.error("Failed to register webhook on startup", e);
+        }
+    }
+
+    private void deleteWebhook() {
+        try {
+            telegramClient.execute(new DeleteWebhook());
+            log.info("Webhook deleted");
+        } catch (TelegramApiException e) {
+            log.error("Failed to delete webhook on shutdown", e);
+        }
     }
 }
