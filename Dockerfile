@@ -20,7 +20,7 @@ RUN ./gradlew nativeCompile --no-daemon
 ############################
 # Stage: minimal runtime
 ############################
-FROM debian:bookworm-slim
+FROM debian:13.3-slim
 RUN groupadd -r spring && useradd -r -g spring spring
 
 WORKDIR /application
