@@ -32,7 +32,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Compile
-        run: ./gradlew compileJava --no-daemon
+        run: ./gradlew compileJava --build-cache
 
   test:
     name: Test
@@ -61,7 +61,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run tests and generate JaCoCo report
-        run: ./gradlew test jacocoTestReport --info
+        run: ./gradlew test jacocoTestReport --info --build-cache
 
       - name: Run SonarCloud Analysis
         if: env.SONAR_TOKEN != ''
