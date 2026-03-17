@@ -47,6 +47,8 @@ class AutoHomeworkSettingsServiceTest {
 
         service.sendSettingsMessage(200L, 10L);
 
+        verify(client).getSettings(10L);
+        verify(client).getGroupSpecs(10L);
         verify(sender).sendHtml(eq(200L), contains("Авто-домашки"), any());
     }
 
@@ -57,6 +59,8 @@ class AutoHomeworkSettingsServiceTest {
 
         service.editSettingsMessage(200L, 5, 10L);
 
+        verify(client).getSettings(10L);
+        verify(client).getGroupSpecs(10L);
         verify(sender).editHtml(eq(200L), eq(5), contains("Авто-домашки"), any());
     }
 
