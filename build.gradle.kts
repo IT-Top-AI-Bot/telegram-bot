@@ -56,6 +56,7 @@ dependencies {
     localImplementation("org.telegram:telegrambots-springboot-longpolling-starter:$telegramBotsVersion")
     "localCompileOnly"("org.projectlombok:lombok")
     "localAnnotationProcessor"("org.projectlombok:lombok")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -96,6 +97,21 @@ tasks.jacocoTestReport {
         xml.required.set(true)
         html.required.set(true)
     }
+}
+
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = "INSTRUCTION"
+                minimum = "0.80".toBigDecimal()
+            }
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }
 
 tasks.register<JavaExec>("bootRunLocal") {

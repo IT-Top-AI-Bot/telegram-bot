@@ -6,11 +6,10 @@ import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Registers a Jackson 2 message converter with highest priority for all
@@ -26,8 +25,8 @@ import java.util.List;
 public class TelegramWebMvcConfig implements WebMvcConfigurer {
 
     @Override
-    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(0, new TelegramJackson2MessageConverter());
+    public void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
+        builder.addCustomConverter(new TelegramJackson2MessageConverter());
     }
 
     private static class TelegramJackson2MessageConverter extends AbstractHttpMessageConverter<Object> {

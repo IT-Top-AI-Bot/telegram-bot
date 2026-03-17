@@ -1,0 +1,125 @@
+package com.aquadev.ittopaitelegrambot.bot.callback.autohomework;
+
+import com.aquadev.ittopaitelegrambot.bot.service.TelegramMessageSender;
+import com.aquadev.ittopaitelegrambot.bot.state.AutoHomeworkStateService;
+import com.aquadev.ittopaitelegrambot.client.AutoHomeworkClient;
+import com.aquadev.ittopaitelegrambot.client.dto.JournalSpecResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
+
+import java.util.List;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class AutoHomeworkSpecToggleCallbackTest {
+
+    @Mock
+    TelegramMessageSender sender;
+    @Mock
+    AutoHomeworkClient client;
+    @Mock
+    AutoHomeworkStateService stateService;
+
+    AutoHomeworkSpecToggleCallback callback;
+
+    @BeforeEach
+    void setUp() {
+        callback = new AutoHomeworkSpecToggleCallback(sender, client, stateService);
+    }
+
+    @Test
+    void supports_returnsTrue_forSpecTogglePrefix() {
+        assertThat(callback.supports(AutoHomeworkCallbackData.SPEC_TOGGLE + "42")).isTrue();
+    }
+
+    @Test
+    void supports_returnsFalse_forOtherData() {
+        assertThat(callback.supports(AutoHomeworkCallbackData.SPEC_SAVE)).isFalse();
+    }
+
+    @Test
+    void handle_validSpecId_togglesAndUpdatesMarkup() {
+        var specs = List.of(new JournalSpecResponse(42L, "Math", "MTH"));
+        Update update = mockCallbackUpdate(AutoHomeworkCallbackData.SPEC_TOGGLE + "42", 10L, 200L, 3, true);
+
+        given(client.getGroupSpecs(10L)).willReturn(specs);
+        given(stateService.getPendingSpecIds(10L)).willReturn(Set.of(42L));
+
+        callback.handle(update);
+
+        verify(stateService).toggleSpec(10L, 42L);
+        verify(sender).answerCallback("cb-id");
+        verify(sender).editMarkup(eq(200L), eq(3), any());
+    }
+
+    @Test
+    void handle_invalidSpecId_answersWithError() {
+        Update update = mockCallbackUpdate(AutoHomeworkCallbackData.SPEC_TOGGLE + "abc", 10L, 200L, 3, true);
+
+        callback.handle(update);
+
+        verify(sender).answerCallback(eq("cb-id"), contains("Неверный"));
+        verifyNoInteractions(client, stateService);
+    }
+
+    @Test
+    void handle_emptySpecId_answersWithError() {
+        Update update = mockCallbackUpdate(AutoHomeworkCallbackData.SPEC_TOGGLE, 10L, 200L, 3, true);
+
+        callback.handle(update);
+
+        verify(sender).answerCallback(eq("cb-id"), any());
+        verifyNoInteractions(client, stateService);
+    }
+
+    @Test
+    void handle_inaccessibleMessage_answersWithError() {
+        Update update = mockCallbackUpdate(AutoHomeworkCallbackData.SPEC_TOGGLE + "1", 10L, 0L, 0, false);
+
+        callback.handle(update);
+
+        verify(sender).answerCallback(eq("cb-id"), contains("устарело"));
+        verifyNoInteractions(client, stateService);
+    }
+
+    private Update mockCallbackUpdate(String data, long userId, long chatId, int messageId, boolean accessible) {
+        Update update = mock(Update.class);
+        CallbackQuery cq = mock(CallbackQuery.class);
+        User from = mock(User.class);
+
+        given(update.getCallbackQuery()).willReturn(cq);
+        given(cq.getId()).willReturn("cb-id");
+        given(cq.getData()).willReturn(data);
+        given(cq.getFrom()).willReturn(from);
+        given(from.getId()).willReturn(userId);
+
+        if (accessible) {
+            Message message = mock(Message.class);
+            given(cq.getMessage()).willReturn(message);
+            given(message.getChatId()).willReturn(chatId);
+            given(message.getMessageId()).willReturn(messageId);
+        } else {
+            given(cq.getMessage()).willReturn(null);
+        }
+        return update;
+    }
+}

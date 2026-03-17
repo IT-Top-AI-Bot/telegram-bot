@@ -20,13 +20,13 @@ public class CommandRegistry {
 
     private final List<CommandHandler> handlers;
 
-    private Map<String, CommandHandler> commandMap;
+    private Map<String, CommandHandler> commandMap = Map.of();
 
     /**
      * Метаданные команд в порядке регистрации (для /help, SetMyCommands и т.д.)
      */
     @Getter
-    private List<TelegramBotCommand> commandMetadata;
+    private List<TelegramBotCommand> commandMetadata = List.of();
 
     @PostConstruct
     void build() {

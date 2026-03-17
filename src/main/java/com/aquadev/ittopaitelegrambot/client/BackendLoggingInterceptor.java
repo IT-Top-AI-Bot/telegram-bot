@@ -19,8 +19,9 @@ import java.util.TreeMap;
 @Component
 public class BackendLoggingInterceptor implements ClientHttpRequestInterceptor {
 
-    private static final Set<String> SENSITIVE_HEADERS = Set.of(
-            "authorization", "cookie", "set-cookie", "proxy-authorization"
+    private static final Set<String> LOGGABLE_HEADERS = Set.of(
+            "content-type", "accept", "user-agent", "host",
+            "x-telegram-user-id", "x-request-id", "x-b3-traceid"
     );
 
     @Override
@@ -31,10 +32,10 @@ public class BackendLoggingInterceptor implements ClientHttpRequestInterceptor {
 
         Map<String, List<String>> sanitizedHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         request.getHeaders().forEach((headerName, headerValues) -> {
-            if (SENSITIVE_HEADERS.contains(headerName.toLowerCase())) {
-                sanitizedHeaders.put(headerName, List.of("***"));
-            } else {
+            if (LOGGABLE_HEADERS.contains(headerName.toLowerCase())) {
                 sanitizedHeaders.put(headerName, new ArrayList<>(headerValues));
+            } else {
+                sanitizedHeaders.put(headerName, List.of("***"));
             }
         });
 
