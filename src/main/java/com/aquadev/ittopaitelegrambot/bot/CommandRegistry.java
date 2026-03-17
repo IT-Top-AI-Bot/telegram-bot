@@ -22,9 +22,6 @@ public class CommandRegistry {
 
     private Map<String, CommandHandler> commandMap = Map.of();
 
-    /**
-     * Метаданные команд в порядке регистрации (для /help, SetMyCommands и т.д.)
-     */
     @Getter
     private List<TelegramBotCommand> commandMetadata = List.of();
 
@@ -37,13 +34,17 @@ public class CommandRegistry {
             TelegramBotCommand annotation = AopUtils.getTargetClass(handler).getAnnotation(TelegramBotCommand.class);
             if (annotation != null) {
                 String command = annotation.value();
-                if (map.containsKey(command)) {
-                    CommandHandler existing = map.get(command);
-                    throw new IllegalStateException("Duplicate command found: '" + command + "' in handlers "
-                            + AopUtils.getTargetClass(existing).getName() + " and "
-                            + AopUtils.getTargetClass(handler).getName());
+                CommandHandler existing = map.putIfAbsent(command, handler);
+
+                if (existing != null) {
+                    throw new IllegalStateException(String.format(
+                            "Duplicate command found: '%s' in handlers %s and %s",
+                            command,
+                            AopUtils.getTargetClass(existing).getName(),
+                            AopUtils.getTargetClass(handler).getName()
+                    ));
                 }
-                map.put(command, handler);
+
                 metadata.add(annotation);
             }
         }
