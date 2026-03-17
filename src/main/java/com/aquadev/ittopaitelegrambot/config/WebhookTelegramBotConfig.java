@@ -53,7 +53,7 @@ public class WebhookTelegramBotConfig {
             );
             log.info("SetWebhook execution status: {}", success);
             log.info("Webhook registered: {}", telegramProperties.webhook().url());
-            botCommandsRegistrar.run(null);
+            botCommandsRegistrar.run();
         } catch (TelegramApiException e) {
             log.error("CRITICAL: Failed to register webhook on startup", e);
         }

@@ -27,12 +27,9 @@ public class TelegramRuntimeHints implements RuntimeHintsRegistrar {
                                 .getClassMetadata().getClassName();
                         Class<?> clazz = classLoader.loadClass(className);
                         hints.reflection().registerType(clazz,
-                                MemberCategory.DECLARED_FIELDS,
-                                MemberCategory.INTROSPECT_DECLARED_CONSTRUCTORS,
+                                MemberCategory.ACCESS_DECLARED_FIELDS,
                                 MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
-                                MemberCategory.INTROSPECT_DECLARED_METHODS,
-                                MemberCategory.INVOKE_DECLARED_METHODS,
-                                MemberCategory.DECLARED_CLASSES);
+                                MemberCategory.INVOKE_DECLARED_METHODS);
                     } catch (Exception _) {
                     }
                 }

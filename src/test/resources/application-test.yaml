@@ -1,0 +1,22 @@
+spring:
+  cloud:
+    kubernetes:
+      enabled: false
+      config:
+        enabled: false
+      secrets:
+        enabled: false
+  main:
+    cloud-platform: none
+
+telegram:
+  bot:
+    token: test:TOKEN
+    username: test_bot
+    webhook:
+      host: http://localhost
+      path: /webhook
+      secret-token: test-secret
+
+backend:
+  base-url: http://localhost:8080

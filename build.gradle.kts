@@ -1,8 +1,14 @@
 plugins {
     java
+    jacoco
+    id("org.sonarqube") version "7.2.3.7755"
     id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.graalvm.buildtools.native") version "0.11.5"
+}
+
+jacoco {
+    toolVersion = "0.8.14"
 }
 
 sourceSets {
@@ -10,6 +16,13 @@ sourceSets {
         java.srcDir("src/local/java")
         compileClasspath += sourceSets.main.get().output + configurations["compileClasspath"]
         runtimeClasspath += sourceSets.main.get().output + configurations["runtimeClasspath"]
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "IT-Top-AI-Bot_telegram-bot")
+        property("sonar.organization", "it-top-ai-bot")
     }
 }
 
@@ -43,6 +56,7 @@ dependencies {
     localImplementation("org.telegram:telegrambots-springboot-longpolling-starter:$telegramBotsVersion")
     "localCompileOnly"("org.projectlombok:lombok")
     "localAnnotationProcessor"("org.projectlombok:lombok")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -74,6 +88,31 @@ tasks.named<JavaExec>("processAot") {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.test)
+    violationRules {
+        rule {
+            limit {
+                counter = "INSTRUCTION"
+                minimum = "0.80".toBigDecimal()
+            }
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }
 
 tasks.register<JavaExec>("bootRunLocal") {
