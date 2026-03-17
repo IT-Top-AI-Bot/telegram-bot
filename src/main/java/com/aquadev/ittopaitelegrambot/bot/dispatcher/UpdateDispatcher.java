@@ -1,6 +1,7 @@
 package com.aquadev.ittopaitelegrambot.bot.dispatcher;
 
 import com.aquadev.ittopaitelegrambot.bot.annotation.TelegramBotCommand;
+import com.aquadev.ittopaitelegrambot.bot.handler.AutoHomeworkFlowHandler;
 import com.aquadev.ittopaitelegrambot.bot.handler.CommandHandler;
 import com.aquadev.ittopaitelegrambot.bot.handler.RegistrationFlowHandler;
 import com.aquadev.ittopaitelegrambot.bot.state.RegistrationStateService;
@@ -23,6 +24,7 @@ public class UpdateDispatcher {
     private final List<CommandHandler> handlers;
     private final RegistrationFlowHandler registrationFlowHandler;
     private final RegistrationStateService registrationStateService;
+    private final AutoHomeworkFlowHandler autoHomeworkFlowHandler;
     private final Map<String, CommandHandler> commandMap = new HashMap<>();
 
     @PostConstruct
@@ -37,6 +39,16 @@ public class UpdateDispatcher {
 
     public void dispatch(Update update) {
         log.info("Received update: {}", update.getUpdateId());
+
+        if (update.hasCallbackQuery()) {
+            String data = update.getCallbackQuery().getData();
+            if (data != null && data.startsWith("autohw:")) {
+                log.info("Dispatching callback '{}' to auto-homework flow handler", data);
+                autoHomeworkFlowHandler.handleCallback(update);
+            }
+            return;
+        }
+
         if (!update.hasMessage() || !update.getMessage().hasText()) {
             log.debug("Update has no message or text");
             return;

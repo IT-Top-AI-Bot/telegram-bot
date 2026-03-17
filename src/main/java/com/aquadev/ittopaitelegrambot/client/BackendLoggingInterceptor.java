@@ -19,7 +19,9 @@ public class BackendLoggingInterceptor implements ClientHttpRequestInterceptor {
             throws IOException {
         long start = System.currentTimeMillis();
         String userId = request.getHeaders().getFirst("X-Telegram-User-Id");
-        log.info("→ {} {} [user={}]", request.getMethod(), request.getURI(), userId);
+
+        log.info("→ {} {} [user={}] | Headers: {}",
+                request.getMethod(), request.getURI(), userId, request.getHeaders());
 
         ClientHttpResponse response = execution.execute(request, body);
 

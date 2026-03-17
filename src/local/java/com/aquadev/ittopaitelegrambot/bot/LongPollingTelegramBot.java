@@ -3,7 +3,9 @@ package com.aquadev.ittopaitelegrambot.bot;
 import com.aquadev.ittopaitelegrambot.bot.dispatcher.UpdateDispatcher;
 import com.aquadev.ittopaitelegrambot.config.properties.TelegramProperties;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
 import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
@@ -20,6 +22,7 @@ public class LongPollingTelegramBot implements SpringLongPollingBot, LongPolling
 
     private final TelegramProperties telegramProperties;
     private final UpdateDispatcher updateDispatcher;
+    private final BotCommandsRegistrar botCommandsRegistrar;
 
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
@@ -31,6 +34,11 @@ public class LongPollingTelegramBot implements SpringLongPollingBot, LongPolling
     @Override
     public LongPollingUpdateConsumer getUpdatesConsumer() {
         return this;
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void registerCommands() {
+        botCommandsRegistrar.run(null);
     }
 
     @Override
