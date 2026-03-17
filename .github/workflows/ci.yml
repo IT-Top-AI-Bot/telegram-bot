@@ -64,7 +64,7 @@ jobs:
         run: ./gradlew test jacocoTestReport --info
 
       - name: Run SonarCloud Analysis
-        if: secrets.SONAR_TOKEN != ''
+        if: env.SONAR_TOKEN != ''
         run: ./gradlew sonar --info
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
