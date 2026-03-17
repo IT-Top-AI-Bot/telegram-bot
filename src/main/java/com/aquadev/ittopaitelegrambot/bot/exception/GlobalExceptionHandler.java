@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     }
 
     private void handleTelegramSendException(TelegramSendException e) {
-        log.error("Telegram send error: {}", e.getCause().getMessage());
+        log.error("Telegram send error: {}", e.getCause() != null ? e.getCause().getMessage() : e.getMessage());
     }
 
     private void handleTelegramApiException(TelegramApiException e) {

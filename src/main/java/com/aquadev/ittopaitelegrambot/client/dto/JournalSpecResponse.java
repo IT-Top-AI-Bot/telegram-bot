@@ -1,7 +1,7 @@
 package com.aquadev.ittopaitelegrambot.client.dto;
 
 public record JournalSpecResponse(
-        Integer id,
+        Long id,
         String name,
         String shortName
 ) {

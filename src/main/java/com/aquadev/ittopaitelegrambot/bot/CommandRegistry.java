@@ -36,7 +36,14 @@ public class CommandRegistry {
         for (CommandHandler handler : handlers) {
             TelegramBotCommand annotation = AopUtils.getTargetClass(handler).getAnnotation(TelegramBotCommand.class);
             if (annotation != null) {
-                map.put(annotation.value(), handler);
+                String command = annotation.value();
+                if (map.containsKey(command)) {
+                    CommandHandler existing = map.get(command);
+                    throw new IllegalStateException("Duplicate command found: '" + command + "' in handlers "
+                            + AopUtils.getTargetClass(existing).getName() + " and "
+                            + AopUtils.getTargetClass(handler).getName());
+                }
+                map.put(command, handler);
                 metadata.add(annotation);
             }
         }

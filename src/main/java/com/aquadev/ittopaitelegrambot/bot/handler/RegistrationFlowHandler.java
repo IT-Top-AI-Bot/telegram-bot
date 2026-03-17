@@ -9,6 +9,7 @@ import com.aquadev.ittopaitelegrambot.client.UserClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
@@ -40,7 +41,7 @@ public class RegistrationFlowHandler {
                         .formatted(user.journalUsername()));
             } catch (HttpClientErrorException.Conflict _) {
                 throw new RegistrationConflictException(username);
-            } catch (HttpClientErrorException _) {
+            } catch (RestClientException _) {
                 throw new RegistrationFailedException();
             }
         }

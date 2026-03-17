@@ -26,7 +26,7 @@ public final class AutoHomeworkKeyboardFactory {
             specsLine = "<i>не выбраны</i>";
         } else {
             Map<Long, String> nameById = allSpecs.stream()
-                    .collect(Collectors.toMap(s -> s.id().longValue(), JournalSpecResponse::name));
+                    .collect(Collectors.toMap(s -> s.id(), JournalSpecResponse::name, (existing, replacement) -> existing));
             specsLine = settings.specIds().stream()
                     .sorted()
                     .map(id -> nameById.getOrDefault(id, "ID " + id))
@@ -55,7 +55,7 @@ public final class AutoHomeworkKeyboardFactory {
                                                          Set<Long> selectedIds) {
         var builder = InlineKeyboardMarkup.builder();
         for (JournalSpecResponse spec : specs) {
-            boolean selected = selectedIds.contains(spec.id().longValue());
+            boolean selected = selectedIds.contains(spec.id());
             builder.keyboardRow(new InlineKeyboardRow(InlineKeyboardButton.builder()
                     .text((selected ? "✅ " : "☐ ") + spec.name())
                     .callbackData(AutoHomeworkCallbackData.SPEC_TOGGLE + spec.id())

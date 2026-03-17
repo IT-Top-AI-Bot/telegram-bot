@@ -2,7 +2,6 @@ package com.aquadev.ittopaitelegrambot.bot.state;
 
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +24,7 @@ public class AutoHomeworkStateService {
 
     public Set<Long> getPendingSpecIds(long userId) {
         Set<Long> specs = pendingSpecIds.get(userId);
-        return specs != null ? Collections.unmodifiableSet(specs) : Set.of();
+        return specs != null ? Set.copyOf(specs) : Set.of();
     }
 
     public void clear(long userId) {

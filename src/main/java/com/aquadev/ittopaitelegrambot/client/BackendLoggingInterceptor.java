@@ -9,10 +9,19 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 @Slf4j
 @Component
 public class BackendLoggingInterceptor implements ClientHttpRequestInterceptor {
+
+    private static final Set<String> SENSITIVE_HEADERS = Set.of(
+            "authorization", "cookie", "set-cookie", "proxy-authorization"
+    );
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
@@ -20,8 +29,17 @@ public class BackendLoggingInterceptor implements ClientHttpRequestInterceptor {
         long start = System.currentTimeMillis();
         String userId = request.getHeaders().getFirst("X-Telegram-User-Id");
 
+        Map<String, List<String>> sanitizedHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        request.getHeaders().forEach((headerName, headerValues) -> {
+            if (SENSITIVE_HEADERS.contains(headerName.toLowerCase())) {
+                sanitizedHeaders.put(headerName, List.of("***"));
+            } else {
+                sanitizedHeaders.put(headerName, new ArrayList<>(headerValues));
+            }
+        });
+
         log.info("→ {} {} [user={}] | Headers: {}",
-                request.getMethod(), request.getURI(), userId, request.getHeaders());
+                request.getMethod(), request.getURI(), userId, sanitizedHeaders);
 
         ClientHttpResponse response = execution.execute(request, body);
 

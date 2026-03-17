@@ -1,8 +1,14 @@
 plugins {
     java
+    jacoco
+    id("org.sonarqube") version "7.2.3.7755"
     id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.graalvm.buildtools.native") version "0.11.5"
+}
+
+jacoco {
+    toolVersion = "0.8.14"
 }
 
 sourceSets {
@@ -10,6 +16,13 @@ sourceSets {
         java.srcDir("src/local/java")
         compileClasspath += sourceSets.main.get().output + configurations["compileClasspath"]
         runtimeClasspath += sourceSets.main.get().output + configurations["runtimeClasspath"]
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "IT-Top-AI-Bot_telegram-bot")
+        property("sonar.organization", "it-top-ai-bot")
     }
 }
 
@@ -74,6 +87,15 @@ tasks.named<JavaExec>("processAot") {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
 }
 
 tasks.register<JavaExec>("bootRunLocal") {
