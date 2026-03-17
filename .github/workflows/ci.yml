@@ -7,40 +7,13 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-    name: Build
+  build-and-test:
+    name: Build and Test
     permissions:
       contents: read
       packages: read
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Set up JDK 25
-        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
-        with:
-          distribution: temurin
-          java-version: "25"
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
-
-      - name: Make Gradle wrapper executable
-        run: chmod +x gradlew
-
-      - name: Compile
-        run: ./gradlew compileJava --build-cache
-
-  test:
-    name: Test
-    permissions:
-      contents: read
-    runs-on: ubuntu-latest
-    needs: [ build ]
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - name: Checkout
@@ -60,8 +33,8 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
 
-      - name: Run tests and generate JaCoCo report
-        run: ./gradlew test jacocoTestReport --info --build-cache
+      - name: Build and run tests
+        run: ./gradlew build jacocoTestReport --info --build-cache
 
       - name: Run SonarCloud Analysis
         if: env.SONAR_TOKEN != ''
@@ -76,7 +49,7 @@ jobs:
       packages: write
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-    needs: [ test ]
+    needs: [ build-and-test ]
     timeout-minutes: 60
 
     steps:
