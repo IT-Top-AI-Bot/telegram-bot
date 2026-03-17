@@ -1,5 +1,6 @@
 package com.aquadev.ittopaitelegrambot.config;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
@@ -12,11 +13,11 @@ public class TelegramRuntimeHints implements RuntimeHintsRegistrar {
 
     private static final String[] SCAN_PATTERNS = {
             "classpath*:org/telegram/telegrambots/**/*.class",
-            "classpath*:com/aquadev/ittopaitelegrambot/client/dto/**/*.class"
+            "classpath*:com/aquadev/ittopaitelegrambot/**/*.class"
     };
 
     @Override
-    public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+    public void registerHints(@NonNull RuntimeHints hints, ClassLoader classLoader) {
         var resolver = new PathMatchingResourcePatternResolver();
         var metadataFactory = new CachingMetadataReaderFactory(resolver);
         for (String pattern : SCAN_PATTERNS) {

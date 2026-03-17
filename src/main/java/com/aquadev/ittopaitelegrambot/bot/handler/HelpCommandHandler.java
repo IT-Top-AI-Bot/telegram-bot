@@ -3,7 +3,7 @@ package com.aquadev.ittopaitelegrambot.bot.handler;
 import com.aquadev.ittopaitelegrambot.bot.CommandRegistry;
 import com.aquadev.ittopaitelegrambot.bot.annotation.TelegramBotCommand;
 import com.aquadev.ittopaitelegrambot.bot.service.TelegramMessageSender;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -14,16 +14,22 @@ import java.util.stream.Collectors;
 public class HelpCommandHandler implements CommandHandler {
 
     private final TelegramMessageSender sender;
-    private final CommandRegistry commandRegistry;
+    private final ObjectProvider<CommandRegistry> commandRegistryProvider;
 
-    public HelpCommandHandler(TelegramMessageSender sender, @Lazy CommandRegistry commandRegistry) {
+    public HelpCommandHandler(TelegramMessageSender sender, ObjectProvider<CommandRegistry> commandRegistryProvider) {
         this.sender = sender;
-        this.commandRegistry = commandRegistry;
+        this.commandRegistryProvider = commandRegistryProvider;
     }
 
     @Override
     public void handle(Update update) {
         long chatId = update.getMessage().getChatId();
+
+        CommandRegistry commandRegistry = commandRegistryProvider.getIfAvailable();
+        if (commandRegistry == null) {
+            sender.send(chatId, "Команды временно недоступны.");
+            return;
+        }
 
         String commandList = commandRegistry.getCommandMetadata().stream()
                 .map(cmd -> "%s — %s".formatted(cmd.value(), cmd.description()))
