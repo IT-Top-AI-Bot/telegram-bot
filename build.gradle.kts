@@ -100,6 +100,7 @@ tasks.jacocoTestReport {
 }
 
 tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.test)
     violationRules {
         rule {
             limit {

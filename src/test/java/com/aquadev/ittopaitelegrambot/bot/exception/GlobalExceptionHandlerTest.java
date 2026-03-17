@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
@@ -48,7 +49,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handle_telegramSendException_doesNotSendMessage() throws TelegramApiException {
+    void handle_telegramSendException_doesNotSendMessage() {
         TelegramSendException ex = new TelegramSendException("send fail", new TelegramApiException("api"));
 
         handler.handle(null, ex);
@@ -57,7 +58,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handle_telegramApiException_doesNotSendMessage() throws TelegramApiException {
+    void handle_telegramApiException_doesNotSendMessage() {
         TelegramApiException ex = new TelegramApiException("api error");
 
         handler.handle(null, ex);
@@ -85,7 +86,8 @@ class GlobalExceptionHandlerTest {
         given(telegramClient.execute(any(SendMessage.class))).willThrow(new TelegramApiException("fail"));
 
         // Should not throw - error is logged silently
-        handler.handle(update, ex);
+        assertDoesNotThrow(() -> handler.handle(update, ex));
+        verify(telegramClient).execute(any(SendMessage.class));
     }
 
     private Update mockUpdate(long chatId) {

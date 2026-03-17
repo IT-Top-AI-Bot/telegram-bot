@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class AutoHomeworkSettingsServiceTest {
@@ -64,5 +65,6 @@ class AutoHomeworkSettingsServiceTest {
         service.editSettingsMessage(200L, 5, settings, specs);
 
         verify(sender).editHtml(eq(200L), eq(5), contains("Авто-домашки"), any());
+        verifyNoInteractions(client);
     }
 }
