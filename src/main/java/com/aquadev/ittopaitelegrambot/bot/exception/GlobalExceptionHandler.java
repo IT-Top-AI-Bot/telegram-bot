@@ -1,5 +1,6 @@
 package com.aquadev.ittopaitelegrambot.bot.exception;
 
+import com.aquadev.ittopaitelegrambot.bot.exception.base.BotException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,34 +14,44 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
+    private static final String UNEXPECTED_ERROR_MESSAGE =
+            "Произошла непредвиденная ошибка. Пожалуйста, попробуйте позже.";
+
     private final TelegramClient telegramClient;
 
     public void handle(Update update, Throwable e) {
-        if (e instanceof TelegramApiException telegramEx) {
-            handleTelegramApiException(update, telegramEx);
-        } else if (e.getCause() instanceof TelegramApiException telegramEx) {
-            // RuntimeException wrapping TelegramApiException — message was likely delivered,
-            // just Telegram API didn't return HTTP response in time
-            handleTelegramApiException(update, telegramEx);
-        } else {
-            handleGenericException(update, e);
+        switch (e) {
+            case BotException botEx -> handleBotException(update, botEx);
+            case TelegramSendException sendEx -> handleTelegramSendException(sendEx);
+            case TelegramApiException apiEx -> handleTelegramApiException(apiEx);
+            default -> handleUnexpectedException(update, e);
         }
     }
 
-    private void handleTelegramApiException(Update update, TelegramApiException e) {
-        log.error("Telegram API error while processing update: {}", e.getMessage());
+    private void handleBotException(Update update, BotException e) {
+        log.warn("Bot error [{}]: {}", e.getClass().getSimpleName(), e.getMessage());
+        sendReply(update, e.getMessage());
     }
 
-    private void handleGenericException(Update update, Throwable e) {
+    private void handleTelegramSendException(TelegramSendException e) {
+        log.error("Telegram send error: {}", e.getCause().getMessage());
+    }
+
+    private void handleTelegramApiException(TelegramApiException e) {
+        log.error("Telegram API error: {}", e.getMessage());
+    }
+
+    private void handleUnexpectedException(Update update, Throwable e) {
+        log.error("Unexpected error while processing update", e);
+        sendReply(update, UNEXPECTED_ERROR_MESSAGE);
+    }
+
+    private void sendReply(Update update, String text) {
         long chatId = update.getMessage().getChatId();
-        sendErrorReply(chatId);
-    }
-
-    private void sendErrorReply(long chatId) {
         try {
             telegramClient.execute(SendMessage.builder()
                     .chatId(chatId)
-                    .text("Произошла непредвиденная ошибка. Пожалуйста, попробуйте позже.")
+                    .text(text)
                     .build());
         } catch (TelegramApiException ex) {
             log.error("Failed to send error reply to chat {}: {}", chatId, ex.getMessage());

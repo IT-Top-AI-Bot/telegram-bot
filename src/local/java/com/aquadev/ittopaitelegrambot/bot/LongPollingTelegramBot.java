@@ -38,7 +38,7 @@ public class LongPollingTelegramBot implements SpringLongPollingBot, LongPolling
 
     @EventListener(ApplicationReadyEvent.class)
     public void registerCommands() {
-        botCommandsRegistrar.run(null);
+        botCommandsRegistrar.run();
     }
 
     @Override
