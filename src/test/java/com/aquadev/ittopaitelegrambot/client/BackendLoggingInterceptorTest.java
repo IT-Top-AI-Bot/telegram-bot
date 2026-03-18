@@ -53,7 +53,7 @@ class BackendLoggingInterceptorTest {
     }
 
     @Test
-    void nonLoggableHeader_authorization_isMasked() throws IOException {
+    void nonLoggableHeader_authorization_isPassedThroughUnmasked() throws IOException {
         given(response.getStatusCode()).willReturn(HttpStatus.OK);
         MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.POST, URI.create("/api"));
         request.getHeaders().add("Authorization", "Bearer secret-token");
@@ -63,7 +63,7 @@ class BackendLoggingInterceptorTest {
         try (var res = interceptor.intercept(request, new byte[0], execution)) {
             try (var ignored = verify(execution).execute(captor.capture(), any())) {
             }
-            assertThat(captor.getValue().getHeaders().getFirst("Authorization")).isEqualTo("***");
+            assertThat(captor.getValue().getHeaders().getFirst("Authorization")).isEqualTo("Bearer secret-token");
             assertThat(captor.getValue().getHeaders().getFirst("content-type")).isEqualTo("application/json");
             assertThat(res).isSameAs(response);
         }

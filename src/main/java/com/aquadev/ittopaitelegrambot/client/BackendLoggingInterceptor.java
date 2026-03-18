@@ -48,7 +48,7 @@ public class BackendLoggingInterceptor implements ClientHttpRequestInterceptor {
         log.info("→ {} {} [user={}] | Headers: {}",
                 sanitizedRequest.getMethod(), sanitizedRequest.getURI(), userId, sanitizedRequest.getHeaders());
 
-        ClientHttpResponse response = execution.execute(sanitizedRequest, body);
+        ClientHttpResponse response = execution.execute(request, body);
 
         long duration = System.currentTimeMillis() - start;
         HttpStatusCode status = response.getStatusCode();
