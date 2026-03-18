@@ -2,7 +2,9 @@ package com.aquadev.ittopaitelegrambot.bot.dispatcher;
 
 import com.aquadev.ittopaitelegrambot.bot.CommandRegistry;
 import com.aquadev.ittopaitelegrambot.bot.handler.RegistrationFlowHandler;
+import com.aquadev.ittopaitelegrambot.bot.handler.SubjectSettingsTextInputHandler;
 import com.aquadev.ittopaitelegrambot.bot.state.RegistrationStateService;
+import com.aquadev.ittopaitelegrambot.bot.state.SubjectSettingsStateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,8 @@ public class UpdateDispatcher {
     private final CallbackDispatcher callbackDispatcher;
     private final RegistrationFlowHandler registrationFlowHandler;
     private final RegistrationStateService registrationStateService;
+    private final SubjectSettingsTextInputHandler subjectSettingsTextInputHandler;
+    private final SubjectSettingsStateService subjectSettingsStateService;
 
     public void dispatch(Update update) {
         log.info("Received update: {}", update.getUpdateId());
@@ -41,6 +45,9 @@ public class UpdateDispatcher {
         if (handler != null) {
             log.info("Dispatching to command handler: {}", handler.getClass().getSimpleName());
             handler.handle(update);
+        } else if (subjectSettingsStateService.isAwaitingInput(telegramUserId)) {
+            log.info("Dispatching to subject settings text input for user: {}", telegramUserId);
+            subjectSettingsTextInputHandler.handle(update);
         } else if (registrationStateService.isInProgress(telegramUserId)) {
             log.info("Dispatching to registration flow for user: {}", telegramUserId);
             registrationFlowHandler.handle(update);

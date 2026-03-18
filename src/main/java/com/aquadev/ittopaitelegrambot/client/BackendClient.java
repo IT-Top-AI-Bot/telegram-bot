@@ -68,4 +68,18 @@ public abstract class BackendClient {
             throw new RuntimeException(e);
         }
     }
+
+    protected void delete(long telegramUserId, String uri) {
+        try {
+            ScopedValue.where(TelegramUserContext.TG_USER_ID, telegramUserId)
+                    .run(() -> restClient.delete()
+                            .uri(uri)
+                            .retrieve()
+                            .toBodilessEntity());
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

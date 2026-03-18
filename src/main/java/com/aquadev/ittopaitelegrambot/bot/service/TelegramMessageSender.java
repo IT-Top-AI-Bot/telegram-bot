@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -72,6 +73,29 @@ public class TelegramMessageSender {
             telegramClient.execute(builder.build());
         } catch (TelegramApiException e) {
             log.warn("Не удалось ответить на callback {}: {}", callbackId, e.getMessage());
+        }
+    }
+
+    public void answerCallbackAlert(String callbackId, String text) {
+        try {
+            telegramClient.execute(AnswerCallbackQuery.builder()
+                    .callbackQueryId(callbackId)
+                    .text(text)
+                    .showAlert(true)
+                    .build());
+        } catch (TelegramApiException e) {
+            log.warn("Не удалось показать alert для callback {}: {}", callbackId, e.getMessage());
+        }
+    }
+
+    public void deleteMessage(long chatId, int messageId) {
+        try {
+            telegramClient.execute(DeleteMessage.builder()
+                    .chatId(chatId)
+                    .messageId(messageId)
+                    .build());
+        } catch (TelegramApiException e) {
+            log.warn("Не удалось удалить сообщение chatId={}, messageId={}: {}", chatId, messageId, e.getMessage());
         }
     }
 

@@ -3,7 +3,9 @@ package com.aquadev.ittopaitelegrambot.bot.dispatcher;
 import com.aquadev.ittopaitelegrambot.bot.CommandRegistry;
 import com.aquadev.ittopaitelegrambot.bot.handler.CommandHandler;
 import com.aquadev.ittopaitelegrambot.bot.handler.RegistrationFlowHandler;
+import com.aquadev.ittopaitelegrambot.bot.handler.SubjectSettingsTextInputHandler;
 import com.aquadev.ittopaitelegrambot.bot.state.RegistrationStateService;
+import com.aquadev.ittopaitelegrambot.bot.state.SubjectSettingsStateService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +32,10 @@ class UpdateDispatcherTest {
     @Mock
     RegistrationStateService registrationStateService;
     @Mock
+    SubjectSettingsTextInputHandler subjectSettingsTextInputHandler;
+    @Mock
+    SubjectSettingsStateService subjectSettingsStateService;
+    @Mock
     CommandHandler commandHandler;
 
     UpdateDispatcher dispatcher;
@@ -37,7 +43,8 @@ class UpdateDispatcherTest {
     @BeforeEach
     void setUp() {
         dispatcher = new UpdateDispatcher(commandRegistry, callbackDispatcher,
-                registrationFlowHandler, registrationStateService);
+                registrationFlowHandler, registrationStateService,
+                subjectSettingsTextInputHandler, subjectSettingsStateService);
     }
 
     @Test
@@ -65,6 +72,7 @@ class UpdateDispatcherTest {
     void dispatch_unknownText_userInRegistration_delegatesToRegistrationFlow() {
         Update update = mockMessageUpdate(100L, "johndoe");
         given(commandRegistry.find("johndoe")).willReturn(null);
+        given(subjectSettingsStateService.isAwaitingInput(100L)).willReturn(false);
         given(registrationStateService.isInProgress(100L)).willReturn(true);
 
         dispatcher.dispatch(update);
@@ -77,10 +85,23 @@ class UpdateDispatcherTest {
     void dispatch_unknownText_userNotInRegistration_noHandlerCalled() {
         Update update = mockMessageUpdate(100L, "hello");
         given(commandRegistry.find("hello")).willReturn(null);
+        given(subjectSettingsStateService.isAwaitingInput(100L)).willReturn(false);
         given(registrationStateService.isInProgress(100L)).willReturn(false);
 
         dispatcher.dispatch(update);
 
+        verifyNoInteractions(registrationFlowHandler, commandHandler);
+    }
+
+    @Test
+    void dispatch_unknownText_userAwaitingSubjectInput_delegatesToSubjectHandler() {
+        Update update = mockMessageUpdate(100L, "some prompt text");
+        given(commandRegistry.find("some")).willReturn(null);
+        given(subjectSettingsStateService.isAwaitingInput(100L)).willReturn(true);
+
+        dispatcher.dispatch(update);
+
+        verify(subjectSettingsTextInputHandler).handle(update);
         verifyNoInteractions(registrationFlowHandler, commandHandler);
     }
 

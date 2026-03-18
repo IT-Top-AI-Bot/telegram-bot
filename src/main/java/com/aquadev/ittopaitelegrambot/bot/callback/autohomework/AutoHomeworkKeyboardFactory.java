@@ -1,5 +1,6 @@
 package com.aquadev.ittopaitelegrambot.bot.callback.autohomework;
 
+import com.aquadev.ittopaitelegrambot.bot.callback.subjectsettings.SubjectSettingsCallbackData;
 import com.aquadev.ittopaitelegrambot.client.dto.AutoHomeworkSettingsResponse;
 import com.aquadev.ittopaitelegrambot.client.dto.JournalSpecResponse;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -47,6 +48,10 @@ public final class AutoHomeworkKeyboardFactory {
                 .keyboardRow(new InlineKeyboardRow(InlineKeyboardButton.builder()
                         .text("📝 Выбрать дисциплины")
                         .callbackData(AutoHomeworkCallbackData.OPEN_SPECS)
+                        .build()))
+                .keyboardRow(new InlineKeyboardRow(InlineKeyboardButton.builder()
+                        .text("⚙️ Настройки предметов")
+                        .callbackData(SubjectSettingsCallbackData.OPEN)
                         .build()))
                 .build();
     }

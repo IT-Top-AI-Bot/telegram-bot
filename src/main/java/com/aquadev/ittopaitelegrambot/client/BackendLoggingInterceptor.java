@@ -27,7 +27,8 @@ public class BackendLoggingInterceptor implements ClientHttpRequestInterceptor {
     public @NonNull ClientHttpResponse intercept(HttpRequest request, byte @NonNull [] body, ClientHttpRequestExecution execution)
             throws IOException {
         long start = System.currentTimeMillis();
-        String userId = request.getHeaders().getFirst("X-Telegram-User-Id");
+        Long userIdRaw = TelegramUserContext.get();
+        String userId = userIdRaw != null ? String.valueOf(userIdRaw) : "system";
 
         HttpHeaders sanitizedHeaders = new HttpHeaders();
         request.getHeaders().forEach((headerName, headerValues) -> {
