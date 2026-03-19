@@ -20,11 +20,11 @@ public final class AutoHomeworkKeyboardFactory {
     public static String buildSettingsText(AutoHomeworkSettingsResponse settings,
                                            List<JournalSpecResponse> allSpecs) {
         boolean enabled = Boolean.TRUE.equals(settings.enabled());
-        String statusLine = enabled ? "✅ Включено" : "❌ Выключено";
+        String statusLine = enabled ? "✅ Активно" : "❌ Выключено";
 
         String specsLine;
         if (settings.specIds() == null || settings.specIds().isEmpty()) {
-            specsLine = "<i>не выбраны</i>";
+            specsLine = "<i>не выбраны — авто-решение не будет работать</i>";
         } else {
             Map<Long, String> nameById = allSpecs.stream()
                     .collect(Collectors.toMap(s -> s.id(), JournalSpecResponse::name, (existing, replacement) -> existing));
@@ -34,7 +34,10 @@ public final class AutoHomeworkKeyboardFactory {
                     .collect(Collectors.joining(", "));
         }
 
-        return "⚙️ <b>Авто-домашки</b>%n%nСтатус: %s%nДисциплины: %s".formatted(statusLine, specsLine);
+        return ("<b>🤖 Авто-решение домашних заданий</b>\n\n"
+                + "Бот отслеживает новые ДЗ в журнале и автоматически отправляет готовый ответ — без вашего участия.\n\n"
+                + "Статус: %s\n"
+                + "Предметы: %s").formatted(statusLine, specsLine);
     }
 
     public static InlineKeyboardMarkup buildSettingsKeyboard(AutoHomeworkSettingsResponse settings) {
@@ -46,11 +49,11 @@ public final class AutoHomeworkKeyboardFactory {
                                 : AutoHomeworkCallbackData.SET_ENABLED + "true")
                         .build()))
                 .keyboardRow(new InlineKeyboardRow(InlineKeyboardButton.builder()
-                        .text("📝 Выбрать дисциплины")
+                        .text("📚 Выбрать предметы")
                         .callbackData(AutoHomeworkCallbackData.OPEN_SPECS)
                         .build()))
                 .keyboardRow(new InlineKeyboardRow(InlineKeyboardButton.builder()
-                        .text("⚙️ Настройки предметов")
+                        .text("✏️ Настройка ответов по предметам")
                         .callbackData(SubjectSettingsCallbackData.OPEN)
                         .build()))
                 .build();

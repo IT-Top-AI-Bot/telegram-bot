@@ -46,7 +46,9 @@ public class AutoHomeworkOpenSpecsCallback implements CallbackHandler {
 
         sender.answerCallback(callback.getId());
         sender.editHtml(chatId, messageId,
-                "📚 <b>Выбор дисциплин</b>\n\nОтметьте дисциплины для авто-решения домашних заданий:",
+                "📚 <b>Предметы для авто-решения</b>\n\n"
+                        + "Отметьте предметы, по которым бот будет автоматически решать ДЗ.\n\n"
+                        + "<i>Тип ответа (AI или готовый текст) настраивается через «Настройка ответов по предметам».</i>",
                 AutoHomeworkKeyboardFactory.buildSpecKeyboard(allSpecs, stateService.getPendingSpecIds(telegramUserId)));
     }
 }
