@@ -71,7 +71,7 @@ class AutoHomeworkOpenSpecsCallbackTest {
 
         verify(stateService).startSpecSelection(42L, Set.of(1L));
         verify(sender).answerCallback("cb-id");
-        verify(sender).editHtml(eq(100L), eq(7), contains("дисциплин"), any());
+        verify(sender).editHtml(eq(100L), eq(7), contains("Предметы"), any());
     }
 
     @Test

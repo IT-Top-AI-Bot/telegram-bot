@@ -88,7 +88,7 @@ class AutoHomeworkKeyboardFactoryTest {
         InlineKeyboardMarkup kb = AutoHomeworkKeyboardFactory.buildSettingsKeyboard(settings);
 
         String secondButtonText = kb.getKeyboard().get(1).get(0).getText();
-        assertThat(secondButtonText).contains("дисциплины");
+        assertThat(secondButtonText).contains("предметы");
     }
 
     @Test

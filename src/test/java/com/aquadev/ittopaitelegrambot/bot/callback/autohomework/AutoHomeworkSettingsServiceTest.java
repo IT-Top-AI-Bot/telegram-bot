@@ -49,7 +49,7 @@ class AutoHomeworkSettingsServiceTest {
 
         verify(client).getSettings(10L);
         verify(client).getGroupSpecs(10L);
-        verify(sender).sendHtml(eq(200L), contains("Авто-домашки"), any());
+        verify(sender).sendHtml(eq(200L), contains("Авто-решение"), any());
     }
 
     @Test
@@ -61,14 +61,14 @@ class AutoHomeworkSettingsServiceTest {
 
         verify(client).getSettings(10L);
         verify(client).getGroupSpecs(10L);
-        verify(sender).editHtml(eq(200L), eq(5), contains("Авто-домашки"), any());
+        verify(sender).editHtml(eq(200L), eq(5), contains("Авто-решение"), any());
     }
 
     @Test
     void editSettingsMessage_withGivenData_callsEditHtmlDirectly() {
         service.editSettingsMessage(200L, 5, settings, specs);
 
-        verify(sender).editHtml(eq(200L), eq(5), contains("Авто-домашки"), any());
+        verify(sender).editHtml(eq(200L), eq(5), contains("Авто-решение"), any());
         verifyNoInteractions(client);
     }
 }

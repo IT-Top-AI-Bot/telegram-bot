@@ -20,7 +20,7 @@ public final class AutoHomeworkKeyboardFactory {
     public static String buildSettingsText(AutoHomeworkSettingsResponse settings,
                                            List<JournalSpecResponse> allSpecs) {
         boolean enabled = Boolean.TRUE.equals(settings.enabled());
-        String statusLine = enabled ? "✅ Активно" : "❌ Выключено";
+        String statusLine = enabled ? "✅ Включено" : "❌ Выключено";
 
         String specsLine;
         if (settings.specIds() == null || settings.specIds().isEmpty()) {
