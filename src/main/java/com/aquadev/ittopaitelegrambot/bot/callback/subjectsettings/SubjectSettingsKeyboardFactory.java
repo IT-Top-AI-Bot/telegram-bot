@@ -127,7 +127,7 @@ public final class SubjectSettingsKeyboardFactory {
                 + "<i>Подходит для предметов, где ответ всегда одинаковый или уже заготовлен.</i>").formatted(specName);
     }
 
-    public static InlineKeyboardMarkup buildCancelKeyboard(Long specId) {
+    public static InlineKeyboardMarkup buildCancelKeyboard() {
         return InlineKeyboardMarkup.builder()
                 .keyboardRow(new InlineKeyboardRow(InlineKeyboardButton.builder()
                         .text("❌ Отмена")
