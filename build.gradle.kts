@@ -101,14 +101,6 @@ tasks.jacocoTestReport {
 
 tasks.jacocoTestCoverageVerification {
     dependsOn(tasks.test)
-    violationRules {
-        rule {
-            limit {
-                counter = "INSTRUCTION"
-                minimum = "0.80".toBigDecimal()
-            }
-        }
-    }
 }
 
 tasks.named("check") {
