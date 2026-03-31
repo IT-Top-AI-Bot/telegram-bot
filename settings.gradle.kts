@@ -1,1 +1,1 @@
-rootProject.name = "it-top-ai-telegram-bot"
+rootProject.name = "telegram-bot"
