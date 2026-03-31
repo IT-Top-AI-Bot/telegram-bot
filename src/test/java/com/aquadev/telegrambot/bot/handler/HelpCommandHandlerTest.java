@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 
@@ -25,12 +26,14 @@ class HelpCommandHandlerTest {
     TelegramMessageSender sender;
     @Mock
     CommandRegistry commandRegistry;
+    @Mock
+    ObjectProvider<CommandRegistry> commandRegistryProvider;
 
     HelpCommandHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new HelpCommandHandler(sender, commandRegistry);
+        handler = new HelpCommandHandler(sender, commandRegistryProvider);
     }
 
     @Test
@@ -42,9 +45,10 @@ class HelpCommandHandlerTest {
             }
         }
         var annotation = FakeHandler.class.getAnnotation(TelegramBotCommand.class);
+        given(commandRegistryProvider.getIfAvailable()).willReturn(commandRegistry);
         given(commandRegistry.getCommandMetadata()).willReturn(List.of(annotation));
 
-        Update update = mockUpdate(999L);
+        Update update = mockUpdate();
         handler.handle(update);
 
         ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
@@ -54,11 +58,11 @@ class HelpCommandHandlerTest {
                 .contains("Запустить бота");
     }
 
-    private Update mockUpdate(long chatId) {
+    private Update mockUpdate() {
         Update update = mock(Update.class);
         Message message = mock(Message.class);
         given(update.getMessage()).willReturn(message);
-        given(message.getChatId()).willReturn(chatId);
+        given(message.getChatId()).willReturn(999L);
         return update;
     }
 }
