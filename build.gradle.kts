@@ -25,7 +25,6 @@ description = "telegram-bot"
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
-        vendor = JvmVendorSpec.matching("GraalVM Community")
     }
 }
 
