@@ -54,6 +54,6 @@ public class SubjectSettingsPromptInputCallback implements CallbackHandler {
         sender.answerCallback(callback.getId());
         sender.editHtml(chatId, messageId,
                 SubjectSettingsKeyboardFactory.buildInputPromptText(specName),
-                SubjectSettingsKeyboardFactory.buildCancelKeyboard(specId));
+                SubjectSettingsKeyboardFactory.buildCancelKeyboard());
     }
 }

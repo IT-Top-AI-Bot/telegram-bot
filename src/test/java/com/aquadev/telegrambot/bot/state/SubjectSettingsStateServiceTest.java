@@ -3,6 +3,8 @@ package com.aquadev.telegrambot.bot.state;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class SubjectSettingsStateServiceTest {
 
     SubjectSettingsStateService service;
@@ -60,3 +62,4 @@ class SubjectSettingsStateServiceTest {
         assertThat(state.inputType()).isEqualTo(SubjectSettingsStateService.InputType.STATIC_TEXT);
     }
 }
+

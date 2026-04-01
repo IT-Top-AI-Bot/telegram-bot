@@ -41,24 +41,20 @@ class AutoHomeworkSettingsServiceTest {
     @Test
     void sendSettingsMessage_fetchesDataAndCallsSendHtml() {
         given(client.getSettings(10L)).willReturn(settings);
-        given(client.getGroupSpecs(10L)).willReturn(specs);
 
         service.sendSettingsMessage(200L, 10L);
 
         verify(client).getSettings(10L);
-        verify(client).getGroupSpecs(10L);
         verify(sender).sendHtml(eq(200L), contains("Авто-решение"), any());
     }
 
     @Test
     void editSettingsMessage_byUserId_fetchesDataAndCallsEditHtml() {
         given(client.getSettings(10L)).willReturn(settings);
-        given(client.getGroupSpecs(10L)).willReturn(specs);
 
         service.editSettingsMessage(200L, 5, 10L);
 
         verify(client).getSettings(10L);
-        verify(client).getGroupSpecs(10L);
         verify(sender).editHtml(eq(200L), eq(5), contains("Авто-решение"), any());
     }
 

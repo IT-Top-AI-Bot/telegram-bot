@@ -19,6 +19,7 @@ import org.telegram.telegrambots.meta.api.objects.message.Message;
 import java.util.List;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -118,3 +119,4 @@ class AutoHomeworkSpecToggleCallbackTest {
         return update;
     }
 }
+

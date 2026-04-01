@@ -54,6 +54,6 @@ public class SubjectSettingsStaticTextInputCallback implements CallbackHandler {
         sender.answerCallback(callback.getId());
         sender.editHtml(chatId, messageId,
                 SubjectSettingsKeyboardFactory.buildInputStaticText(specName),
-                SubjectSettingsKeyboardFactory.buildCancelKeyboard(specId));
+                SubjectSettingsKeyboardFactory.buildCancelKeyboard());
     }
 }

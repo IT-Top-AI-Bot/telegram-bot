@@ -1,6 +1,7 @@
 package com.aquadev.telegrambot.bot.dispatcher;
 
 import com.aquadev.telegrambot.bot.CommandRegistry;
+import com.aquadev.telegrambot.bot.exception.GlobalExceptionHandler;
 import com.aquadev.telegrambot.bot.handler.CommandHandler;
 import com.aquadev.telegrambot.bot.handler.RegistrationFlowHandler;
 import com.aquadev.telegrambot.bot.handler.SubjectSettingsTextInputHandler;
@@ -35,6 +36,8 @@ class UpdateDispatcherTest {
     SubjectSettingsStateService subjectSettingsStateService;
     @Mock
     CommandHandler commandHandler;
+    @Mock
+    GlobalExceptionHandler globalExceptionHandler;
 
     UpdateDispatcher dispatcher;
 
@@ -42,7 +45,7 @@ class UpdateDispatcherTest {
     void setUp() {
         dispatcher = new UpdateDispatcher(commandRegistry, callbackDispatcher,
                 registrationFlowHandler, registrationStateService,
-                subjectSettingsTextInputHandler, subjectSettingsStateService);
+                subjectSettingsTextInputHandler, subjectSettingsStateService, globalExceptionHandler);
     }
 
     @Test

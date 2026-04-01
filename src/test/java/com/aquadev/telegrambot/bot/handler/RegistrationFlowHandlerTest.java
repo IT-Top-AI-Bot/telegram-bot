@@ -133,7 +133,7 @@ class RegistrationFlowHandlerTest {
         User from = mock(User.class);
         given(update.getMessage()).willReturn(message);
         given(message.getChatId()).willReturn(chatId);
-        given(message.getMessageId()).willReturn(99);
+        lenient().when(message.getMessageId()).thenReturn(99);
         given(message.getFrom()).willReturn(from);
         given(from.getId()).willReturn(userId);
         given(message.getText()).willReturn(text);

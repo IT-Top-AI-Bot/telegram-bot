@@ -3,6 +3,8 @@ package com.aquadev.telegrambot.bot.exception.domain.registration;
 import com.aquadev.telegrambot.bot.exception.base.BotException;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class RegistrationConflictExceptionTest {
 
     @Test
@@ -13,3 +15,4 @@ class RegistrationConflictExceptionTest {
         assertThat(ex.getMessage()).contains("johndoe");
     }
 }
+

@@ -186,7 +186,7 @@ class SubjectSettingsKeyboardFactoryTest {
 
     @Test
     void buildCancelKeyboard_hasCancelButton() {
-        InlineKeyboardMarkup kb = SubjectSettingsKeyboardFactory.buildCancelKeyboard(1L);
+        InlineKeyboardMarkup kb = SubjectSettingsKeyboardFactory.buildCancelKeyboard();
         String data = kb.getKeyboard().get(0).get(0).getCallbackData();
         assertThat(data).isEqualTo(SubjectSettingsCallbackData.CANCEL_INPUT);
     }

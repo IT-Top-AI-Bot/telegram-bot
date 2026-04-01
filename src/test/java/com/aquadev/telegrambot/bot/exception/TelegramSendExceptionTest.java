@@ -3,6 +3,8 @@ package com.aquadev.telegrambot.bot.exception;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class TelegramSendExceptionTest {
 
     @Test
@@ -15,3 +17,4 @@ class TelegramSendExceptionTest {
         assertThat(ex.getTelegramCause()).isSameAs(cause);
     }
 }
+

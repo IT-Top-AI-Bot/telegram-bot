@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -110,3 +111,4 @@ class SubjectSettingsViewTextCallbackTest {
         return update;
     }
 }
+

@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class CommandRegistryTest {
@@ -101,3 +102,4 @@ class CommandRegistryTest {
                 .hasMessageContaining("/dup");
     }
 }
+

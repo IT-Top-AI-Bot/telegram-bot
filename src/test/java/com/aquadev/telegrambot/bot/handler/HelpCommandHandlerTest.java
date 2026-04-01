@@ -33,7 +33,7 @@ class HelpCommandHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new HelpCommandHandler(sender, commandRegistryProvider);
+        handler = new HelpCommandHandler(sender, commandRegistry);
     }
 
     @Test
@@ -45,7 +45,6 @@ class HelpCommandHandlerTest {
             }
         }
         var annotation = FakeHandler.class.getAnnotation(TelegramBotCommand.class);
-        given(commandRegistryProvider.getIfAvailable()).willReturn(commandRegistry);
         given(commandRegistry.getCommandMetadata()).willReturn(List.of(annotation));
 
         Update update = mockUpdate();

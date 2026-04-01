@@ -3,6 +3,8 @@ package com.aquadev.telegrambot.bot.state;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class RegistrationStateServiceTest {
 
     private RegistrationStateService service;
@@ -67,3 +69,4 @@ class RegistrationStateServiceTest {
         assertThat(service.getPendingUsername(2L)).isEqualTo("user2");
     }
 }
+
