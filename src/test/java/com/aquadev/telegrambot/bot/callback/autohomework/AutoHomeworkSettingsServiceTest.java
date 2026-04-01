@@ -1,0 +1,68 @@
+package com.aquadev.telegrambot.bot.callback.autohomework;
+
+import com.aquadev.telegrambot.bot.service.TelegramMessageSender;
+import com.aquadev.telegrambot.client.AutoHomeworkClient;
+import com.aquadev.telegrambot.client.dto.AutoHomeworkSettingsResponse;
+import com.aquadev.telegrambot.client.dto.JournalSpecResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+import java.util.Set;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+
+@ExtendWith(MockitoExtension.class)
+class AutoHomeworkSettingsServiceTest {
+
+    @Mock
+    TelegramMessageSender sender;
+    @Mock
+    AutoHomeworkClient client;
+
+    AutoHomeworkSettingsService service;
+
+    private final AutoHomeworkSettingsResponse settings =
+            new AutoHomeworkSettingsResponse(true, null, Set.of(1L));
+    private final List<JournalSpecResponse> specs =
+            List.of(new JournalSpecResponse(1L, "Math", "MTH"));
+
+    @BeforeEach
+    void setUp() {
+        service = new AutoHomeworkSettingsService(sender, client);
+    }
+
+    @Test
+    void sendSettingsMessage_fetchesDataAndCallsSendHtml() {
+        given(client.getSettings(10L)).willReturn(settings);
+
+        service.sendSettingsMessage(200L, 10L);
+
+        verify(client).getSettings(10L);
+        verify(sender).sendHtml(eq(200L), contains("Авто-решение"), any());
+    }
+
+    @Test
+    void editSettingsMessage_byUserId_fetchesDataAndCallsEditHtml() {
+        given(client.getSettings(10L)).willReturn(settings);
+
+        service.editSettingsMessage(200L, 5, 10L);
+
+        verify(client).getSettings(10L);
+        verify(sender).editHtml(eq(200L), eq(5), contains("Авто-решение"), any());
+    }
+
+    @Test
+    void editSettingsMessage_withGivenData_callsEditHtmlDirectly() {
+        service.editSettingsMessage(200L, 5, settings, specs);
+
+        verify(sender).editHtml(eq(200L), eq(5), contains("Авто-решение"), any());
+        verifyNoInteractions(client);
+    }
+}
