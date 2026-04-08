@@ -1,4 +1,4 @@
-package com.aquadev.telegrambot.config;
+package com.aquadev.telegrambot.config.longpolling;
 
 
 import com.aquadev.telegrambot.bot.BotCommandsRegistrar;

@@ -1,4 +1,4 @@
-package com.aquadev.telegrambot.config;
+package com.aquadev.telegrambot.config.observation;
 
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender;

@@ -21,6 +21,7 @@ public class CommandRegistry {
     private final List<CommandHandler> handlers;
 
     private Map<String, CommandHandler> commandMap = Map.of();
+    private Map<String, TelegramBotCommand> annotationMap = Map.of();
 
     @Getter
     private List<TelegramBotCommand> commandMetadata = List.of();
@@ -28,6 +29,7 @@ public class CommandRegistry {
     @PostConstruct
     void build() {
         Map<String, CommandHandler> map = new HashMap<>();
+        Map<String, TelegramBotCommand> annotations = new HashMap<>();
         List<TelegramBotCommand> metadata = new ArrayList<>();
 
         for (CommandHandler handler : handlers) {
@@ -45,15 +47,21 @@ public class CommandRegistry {
                     ));
                 }
 
+                annotations.put(command, annotation);
                 metadata.add(annotation);
             }
         }
 
         commandMap = Collections.unmodifiableMap(map);
+        annotationMap = Collections.unmodifiableMap(annotations);
         commandMetadata = Collections.unmodifiableList(metadata);
     }
 
     public CommandHandler find(String command) {
         return commandMap.get(command);
+    }
+
+    public TelegramBotCommand getAnnotation(String command) {
+        return annotationMap.get(command);
     }
 }

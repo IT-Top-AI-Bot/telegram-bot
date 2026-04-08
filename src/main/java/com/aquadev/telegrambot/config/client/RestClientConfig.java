@@ -1,4 +1,4 @@
-package com.aquadev.telegrambot.config;
+package com.aquadev.telegrambot.config.client;
 
 import com.aquadev.telegrambot.client.BackendLoggingInterceptor;
 import com.aquadev.telegrambot.client.TelegramUserIdInterceptor;
@@ -35,6 +35,17 @@ public class RestClientConfig {
                 .requestInterceptor(backendLoggingInterceptor)
                 .observationRegistry(observationRegistry)
                 .observationConvention(new UriClientObservationConvention())
+                .build();
+    }
+
+    @Bean
+    public RestClient actuatorRestClient() {
+        HttpClient httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(5))
+                .build();
+
+        return RestClient.builder()
+                .requestFactory(new JdkClientHttpRequestFactory(httpClient))
                 .build();
     }
 }

@@ -45,7 +45,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-discoveryclient")
     implementation("org.telegram:telegrambots-springboot-webhook-starter:$telegramBotsVersion")
     if (!isNativeBuild) {
         implementation("org.telegram:telegrambots-springboot-longpolling-starter:$telegramBotsVersion")
@@ -64,7 +63,7 @@ sourceSets {
     main {
         java {
             if (isNativeBuild) {
-                exclude("**/config/LongPollingTelegramBot.java")
+                exclude("**/config/longpolling/**")
             }
         }
     }

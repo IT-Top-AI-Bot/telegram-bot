@@ -1,7 +1,8 @@
-package com.aquadev.telegrambot.config;
+package com.aquadev.telegrambot.config.webhook;
 
 import com.aquadev.telegrambot.bot.BotCommandsRegistrar;
 import com.aquadev.telegrambot.bot.dispatcher.UpdateDispatcher;
+import com.aquadev.telegrambot.config.TelegramRuntimeHints;
 import com.aquadev.telegrambot.config.properties.TelegramProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
