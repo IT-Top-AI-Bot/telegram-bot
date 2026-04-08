@@ -24,9 +24,9 @@ FROM debian:13.4-slim
 RUN groupadd -r spring && useradd -r -g spring spring
 
 WORKDIR /application
-COPY --from=builder /build/build/native/nativeCompile/it-top-ai-telegram-bot .
+COPY --from=builder /build/build/native/nativeCompile/telegram-bot .
 
 USER spring:spring
 EXPOSE 8080
 
-ENTRYPOINT ["/application/it-top-ai-telegram-bot"]
+ENTRYPOINT ["/application/telegram-bot"]
