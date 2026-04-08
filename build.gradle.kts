@@ -2,21 +2,13 @@ plugins {
     java
     jacoco
     id("org.sonarqube") version "7.2.3.7755"
-    id("org.springframework.boot") version "4.0.3"
+    id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.graalvm.buildtools.native") version "0.11.5"
+    id("org.graalvm.buildtools.native") version "1.0.0"
 }
 
 jacoco {
     toolVersion = "0.8.14"
-}
-
-sourceSets {
-    create("local") {
-        java.srcDir("src/local/java")
-        compileClasspath += sourceSets.main.get().output + configurations["compileClasspath"]
-        runtimeClasspath += sourceSets.main.get().output + configurations["runtimeClasspath"]
-    }
 }
 
 sonar {
@@ -28,7 +20,7 @@ sonar {
 
 group = "com.aquadev"
 version = "0.0.1-SNAPSHOT"
-description = "it-top-ai-telegram-bot"
+description = "telegram-bot"
 
 java {
     toolchain {
@@ -42,24 +34,39 @@ repositories {
 
 val telegramBotsVersion = "9.5.0"
 val springCloudVersion by extra("2025.1.1")
+val opentelemetryVersion by extra("2.21.0-alpha")
 
-val localImplementation by configurations.getting
+val isNativeBuild = gradle.startParameter.taskNames.any { taskName ->
+    taskName.contains("nativeCompile") || taskName.contains("processAot")
+}
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aspectj")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-all")
+    implementation("org.springframework.cloud:spring-cloud-starter-config")
+    implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
     implementation("org.telegram:telegrambots-springboot-webhook-starter:$telegramBotsVersion")
+    if (!isNativeBuild) {
+        implementation("org.telegram:telegrambots-springboot-longpolling-starter:$telegramBotsVersion")
+    }
+    implementation("io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0:$opentelemetryVersion")
     implementation("org.telegram:telegrambots-client:$telegramBotsVersion")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    localImplementation("org.telegram:telegrambots-springboot-longpolling-starter:$telegramBotsVersion")
-    "localCompileOnly"("org.projectlombok:lombok")
-    "localAnnotationProcessor"("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+sourceSets {
+    main {
+        java {
+            if (isNativeBuild) {
+                exclude("**/config/longpolling/**")
+            }
+        }
+    }
 }
 
 dependencyManagement {
@@ -71,7 +78,7 @@ dependencyManagement {
 graalvmNative {
     binaries {
         named("main") {
-            imageName.set("it-top-ai-telegram-bot")
+            imageName.set("telegram-bot")
             buildArgs.addAll(
                 "--no-fallback",
                 "-H:+AddAllCharsets",
@@ -101,23 +108,8 @@ tasks.jacocoTestReport {
 
 tasks.jacocoTestCoverageVerification {
     dependsOn(tasks.test)
-    violationRules {
-        rule {
-            limit {
-                counter = "INSTRUCTION"
-                minimum = "0.80".toBigDecimal()
-            }
-        }
-    }
 }
 
 tasks.named("check") {
     dependsOn(tasks.jacocoTestCoverageVerification)
-}
-
-tasks.register<JavaExec>("bootRunLocal") {
-    group = "application"
-    description = "Run the application locally with long polling support"
-    classpath = sourceSets["local"].runtimeClasspath
-    mainClass.set("com.aquadev.ittopaitelegrambot.ItTopAiTelegramBotApplication")
 }

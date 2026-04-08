@@ -1,5 +1,7 @@
 spring:
   cloud:
+    config:
+      enabled: false
     kubernetes:
       enabled: false
       config:
@@ -8,6 +10,7 @@ spring:
         enabled: false
   main:
     cloud-platform: none
+    allow-bean-definition-overriding: true
 
 telegram:
   bot:

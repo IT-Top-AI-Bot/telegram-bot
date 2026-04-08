@@ -3,6 +3,13 @@ spring:
     exclude:
       - org.telegram.telegrambots.webhook.starter.TelegramBotStarterConfiguration
 
+admin:
+  services:
+    - name: telegram-bot
+      actuator-url: http://localhost:${SERVER_PORT:8080}
+    - name: journal-service
+      actuator-url: http://localhost:8085
+
 proxy:
   host: "127.0.0.1"
   port: 7890
