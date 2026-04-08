@@ -29,4 +29,4 @@ COPY --from=builder /build/build/native/nativeCompile/telegram-bot .
 USER spring:spring
 EXPOSE 8080
 
-ENTRYPOINT ["/application/telegram-bot"]
+ENTRYPOINT ["/application/telegram-bot", "-Dlogback.statusListenerClass=NOP"]
