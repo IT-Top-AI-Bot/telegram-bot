@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
 @RequiredArgsConstructor
-@TelegramBotCommand(value = "/start", description = "Запустить бота")
+@TelegramBotCommand(value = "/start", description = "Запустить бота", requiresValidCredentials = false)
 public class StartCommandHandler implements CommandHandler {
 
     private final TelegramMessageSender sender;
@@ -23,17 +23,15 @@ public class StartCommandHandler implements CommandHandler {
         long telegramUserId = update.getMessage().getFrom().getId();
 
         userClient.getMe(telegramUserId).ifPresentOrElse(
-                user -> sender.send(chatId, """
-                        Добро пожаловать, %s!
-                        Используйте /help, чтобы увидеть доступные команды."""
-                        .formatted(user.journalUsername())),
+                user -> sender.send(chatId, "👋 Добро пожаловать, %s!\nИспользуйте /help, чтобы увидеть доступные команды."
+                        .formatted(user.fullName() != null ? user.fullName() : user.journalUsername())),
                 () -> {
                     stateService.start(telegramUserId);
                     sender.send(chatId, """
-                            Вы ещё не зарегистрированы.
+                            👋 Добро пожаловать!
                             Для работы бота нужно привязать ваш аккаунт в электронном журнале.
                             
-                            Введите логин от журнала:""");
+                            🔑 Введите логин от журнала:""");
                 }
         );
     }

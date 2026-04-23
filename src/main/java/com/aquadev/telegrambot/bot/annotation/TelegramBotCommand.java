@@ -15,4 +15,6 @@ public @interface TelegramBotCommand {
     String description();
 
     UserRole[] roles() default {UserRole.USER};
+
+    boolean requiresValidCredentials() default true;
 }

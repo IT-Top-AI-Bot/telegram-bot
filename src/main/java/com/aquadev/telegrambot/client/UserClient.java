@@ -13,6 +13,7 @@ public class UserClient extends BackendClient {
 
     private static final String USERS_ME_URI = "/api/v1/telegram/users/me";
     private static final String USERS_URI = "/api/v1/telegram/users";
+    private static final String USERS_ME_CREDENTIALS_URI = "/api/v1/telegram/users/me/credentials";
 
     public UserClient(RestClient restClient) {
         super(restClient);
@@ -28,5 +29,9 @@ public class UserClient extends BackendClient {
 
     public UserResponse register(long telegramUserId, String journalUsername, String journalPassword) {
         return post(telegramUserId, USERS_URI, new RegisterRequest(journalUsername, journalPassword), UserResponse.class);
+    }
+
+    public UserResponse updateCredentials(long telegramUserId, String journalUsername, String journalPassword) {
+        return put(telegramUserId, USERS_ME_CREDENTIALS_URI, new RegisterRequest(journalUsername, journalPassword), UserResponse.class);
     }
 }

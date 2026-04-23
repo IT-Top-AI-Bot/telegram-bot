@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
 @RequiredArgsConstructor
-@TelegramBotCommand(value = "/admin", description = "Панель администратора", roles = {UserRole.ADMIN})
+@TelegramBotCommand(value = "/admin", description = "Панель администратора", roles = {UserRole.ADMIN}, requiresValidCredentials = false)
 public class AdminCommandHandler implements CommandHandler {
 
     private final TelegramMessageSender sender;
