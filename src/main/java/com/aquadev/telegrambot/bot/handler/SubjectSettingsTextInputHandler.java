@@ -10,20 +10,30 @@ import com.aquadev.telegrambot.client.dto.SubjectPromptDto;
 import com.aquadev.telegrambot.client.dto.UpsertSubjectPromptRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Optional;
 
 @Slf4j
+@Order(0)
 @Component
 @RequiredArgsConstructor
-public class SubjectSettingsTextInputHandler {
+public class SubjectSettingsTextInputHandler implements TextUpdateHandler {
 
     private final TelegramMessageSender sender;
     private final SubjectSettingsStateService stateService;
     private final ExecutorClient executorClient;
 
+    @Override
+    public boolean supports(Update update) {
+        return update.hasMessage()
+                && update.getMessage().hasText()
+                && stateService.isAwaitingInput(update.getMessage().getFrom().getId());
+    }
+
+    @Override
     public void handle(Update update) {
         var userMessage = update.getMessage();
         String text = userMessage.getText().trim();

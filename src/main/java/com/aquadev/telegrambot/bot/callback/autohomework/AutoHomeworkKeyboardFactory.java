@@ -50,7 +50,7 @@ public final class AutoHomeworkKeyboardFactory {
         var builder = InlineKeyboardMarkup.builder();
         boolean allSelected = !specs.isEmpty() && specs.stream().map(JournalSpecResponse::id).allMatch(selectedIds::contains);
         builder.keyboardRow(new InlineKeyboardRow(InlineKeyboardButton.builder()
-                .text(allSelected ? "Выключить все предметы" : "Включить все предметы")
+                .text(allSelected ? "❌ Выключить все предметы" : "✅ Включить все предметы")
                 .style(allSelected ? "danger" : "success")
                 .callbackData(AutoHomeworkCallbackData.SPEC_TOGGLE_ALL)
                 .build()));

@@ -27,6 +27,22 @@ public class TelegramMessageSender {
                 .build());
     }
 
+    public void send(long chatId, String text, InlineKeyboardMarkup markup) {
+        execute(SendMessage.builder()
+                .chatId(chatId)
+                .text(text)
+                .replyMarkup(markup)
+                .build());
+    }
+
+    public void sendHtml(long chatId, String text) {
+        execute(SendMessage.builder()
+                .chatId(chatId)
+                .text(text)
+                .parseMode("HTML")
+                .build());
+    }
+
     public void sendHtml(long chatId, String text, InlineKeyboardMarkup markup) {
         execute(SendMessage.builder()
                 .chatId(chatId)
