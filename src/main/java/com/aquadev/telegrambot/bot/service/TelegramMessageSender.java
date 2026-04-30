@@ -6,9 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
@@ -50,6 +52,24 @@ public class TelegramMessageSender {
                 .parseMode("HTML")
                 .replyMarkup(markup)
                 .build());
+    }
+
+    public void sendPhotoHtml(long chatId, String photoUrl, String caption) {
+        sendPhotoHtml(chatId, photoUrl, caption, null);
+    }
+
+    public void sendPhotoHtml(long chatId, String photoUrl, String caption, InlineKeyboardMarkup markup) {
+        try {
+            var builder = SendPhoto.builder()
+                    .chatId(chatId)
+                    .photo(new InputFile(photoUrl))
+                    .caption(caption)
+                    .parseMode("HTML");
+            if (markup != null) builder.replyMarkup(markup);
+            telegramClient.execute(builder.build());
+        } catch (TelegramApiException e) {
+            throw new TelegramSendException("Не удалось отправить фото", e);
+        }
     }
 
     public void editHtml(long chatId, int messageId, String text, InlineKeyboardMarkup markup) {

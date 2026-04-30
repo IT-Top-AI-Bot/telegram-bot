@@ -41,8 +41,12 @@ public class UpdateDispatcher {
             return;
         }
 
-        if (!update.hasMessage() || !update.getMessage().hasText()) {
-            log.debug("Update has no message or text");
+        if (!update.hasMessage()) {
+            log.debug("Update has no message");
+            return;
+        }
+
+        if (!update.getMessage().hasText()) {
             return;
         }
 
