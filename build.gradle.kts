@@ -45,6 +45,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("org.telegram:telegrambots-springboot-webhook-starter:$telegramBotsVersion")
     if (!isNativeBuild) {
         implementation("org.telegram:telegrambots-springboot-longpolling-starter:$telegramBotsVersion")
@@ -91,6 +92,10 @@ graalvmNative {
 
 tasks.named<JavaExec>("processAot") {
     jvmArgs("-Dspring.profiles.active=kubernetes")
+}
+
+tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
+    jvmArgs("--sun-misc-unsafe-memory-access=allow")
 }
 
 tasks.withType<Test> {
