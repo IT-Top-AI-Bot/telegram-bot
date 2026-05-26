@@ -45,7 +45,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("org.telegram:telegrambots-springboot-webhook-starter:$telegramBotsVersion")
     if (!isNativeBuild) {
         implementation("org.telegram:telegrambots-springboot-longpolling-starter:$telegramBotsVersion")
