@@ -20,9 +20,12 @@ public final class AutoHomeworkKeyboardFactory {
         boolean enabled = Boolean.TRUE.equals(settings.enabled());
         String statusLine = enabled ? "✅ Включено" : "❌ Выключено";
 
-        return ("<b>🤖 Авто-решение домашних заданий</b>\n\n"
-                + "Бот отслеживает новые ДЗ в журнале и автоматически отправляет готовый ответ — без вашего участия.\n\n"
-                + "Статус: %s").formatted(statusLine);
+        return ("""
+                <b>🤖 Авто-решение домашних заданий</b>
+                
+                Бот отслеживает новые ДЗ в журнале и автоматически отправляет готовый ответ - без вашего участия.
+                
+                Статус: %s""").formatted(statusLine);
     }
 
     public static InlineKeyboardMarkup buildSettingsKeyboard(AutoHomeworkSettingsResponse settings) {

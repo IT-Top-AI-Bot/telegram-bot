@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record TelegramProperties(
         String token,
         String username,
+        String apiUrl,
         Webhook webhook
 ) {
     public record Webhook(String host, String path, String secretToken) {

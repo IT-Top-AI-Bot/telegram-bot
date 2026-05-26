@@ -93,6 +93,10 @@ tasks.named<JavaExec>("processAot") {
     jvmArgs("-Dspring.profiles.active=kubernetes")
 }
 
+tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
+    jvmArgs("--sun-misc-unsafe-memory-access=allow")
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
