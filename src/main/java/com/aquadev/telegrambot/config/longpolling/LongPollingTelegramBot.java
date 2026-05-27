@@ -5,8 +5,8 @@ import com.aquadev.telegrambot.bot.BotCommandsRegistrar;
 import com.aquadev.telegrambot.bot.dispatcher.UpdateDispatcher;
 import com.aquadev.telegrambot.config.properties.TelegramProperties;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
@@ -18,8 +18,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Component
-@Profile("local")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "bot.mode", havingValue = "longpolling")
 public class LongPollingTelegramBot implements SpringLongPollingBot, LongPollingUpdateConsumer {
 
     private final TelegramProperties telegramProperties;
