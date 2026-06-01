@@ -32,7 +32,7 @@ repositories {
     mavenCentral()
 }
 
-val telegramBotsVersion = "9.5.0"
+val telegramBotsVersion = "10.0.0"
 val springCloudVersion = "2025.1.1"
 val opentelemetryVersion = "2.21.0-alpha"
 
