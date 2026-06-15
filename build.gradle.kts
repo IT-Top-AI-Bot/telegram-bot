@@ -33,7 +33,7 @@ repositories {
 }
 
 val telegramBotsVersion = "9.5.0"
-val springCloudVersion = "2025.1.1"
+val springCloudVersion = "2025.1.2"
 val opentelemetryVersion = "2.21.0-alpha"
 
 val isNativeBuild = gradle.startParameter.taskNames.any { taskName ->
